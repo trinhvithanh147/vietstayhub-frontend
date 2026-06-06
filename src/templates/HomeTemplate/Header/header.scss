@@ -1,0 +1,15 @@
+.header {
+  a,
+  button {
+    cursor: pointer;
+  }
+  input::placeholder {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+  input:focus::placeholder {
+    font-size: 14px;
+    font-weight: 400;
+    color: #565656;
+  }
+}

@@ -1,0 +1,6 @@
+.header input::-moz-placeholder {
+  color: red;
+}
+.header input::placeholder {
+  color: red;
+}/*# sourceMappingURL=header.css.map */
