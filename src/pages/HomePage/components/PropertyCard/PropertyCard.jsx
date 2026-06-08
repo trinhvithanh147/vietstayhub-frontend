@@ -121,20 +121,24 @@ const PropertyCard = () => {
     reviewService
       .getAll()
       .then((res) => {
-        setReview(res.data.metaData);
-        console.log({ review: res.data.metaData });
+        const reviewList = res.data.metaData || [];
+        setReview(Array.isArray(reviewList) ? reviewList : []);
+        console.log({ review: reviewList });
       })
       .catch((err) => {
         console.log(err);
+        setReview([]);
       });
   }, []);
 
-  const propertyReview = review.filter(
-    (item) =>
-      item.is_visible !== false &&
-      (item.property_id === properties?._id ||
-        item.property_id?._id === properties?._id),
-  );
+  const propertyReview = Array.isArray(review)
+    ? review.filter(
+        (item) =>
+          item.is_visible !== false &&
+          (item.property_id === properties?._id ||
+            item.property_id?._id === properties?._id),
+      )
+    : [];
 
   const totalRating = propertyReview.reduce(
     (sum, item) => sum + item.rating,
@@ -255,11 +259,15 @@ const PropertyCard = () => {
       BookingService.getAll(),
     ])
       .then(([roomRes, bookingRes]) => {
-        setRoom(roomRes.data.metaData);
+        const roomList = roomRes?.data?.metaData || [];
+        const bookingList = bookingRes?.data?.metaData || [];
+
+        setRoom(Array.isArray(roomList) ? roomList : []);
+
         setBookings(
-          (bookingRes?.data?.metaData || []).filter(
-            (booking) => booking.status === "confirmed",
-          ),
+          Array.isArray(bookingList)
+            ? bookingList.filter((booking) => booking.status === "confirmed")
+            : [],
         );
         console.log({ room: roomRes.data.metaData });
       })
@@ -1307,211 +1315,213 @@ const PropertyCard = () => {
 
             <div className="mt-4 h-full w-full overflow-x-auto">
               <div className="min-w-[760px]">
-              <div className="mt-8 grid grid-cols-4 border border-[#cddff6] bg-primary font-semibold text-white sm:mt-12">
-                <div className="z-10 border-r border-[#cddff6] p-3">
-                  Loại chỗ nghỉ
+                <div className="mt-8 grid grid-cols-4 border border-[#cddff6] bg-primary font-semibold text-white sm:mt-12">
+                  <div className="z-10 border-r border-[#cddff6] p-3">
+                    Loại chỗ nghỉ
+                  </div>
+                  <div className="border-r border-[#cddff6] p-3">
+                    Số lượng khách
+                  </div>
+                  <div className="border-r border-[#cddff6] bg-primary p-3">
+                    Giá cho {bookingDateLogic} đêm
+                  </div>
+                  <div className="border-r border-[#cddff6] p-3">Đặt phòng</div>
                 </div>
-                <div className="border-r border-[#cddff6] p-3">
-                  Số lượng khách
-                </div>
-                <div className="border-r border-[#cddff6] bg-primary p-3">
-                  Giá cho {bookingDateLogic} đêm
-                </div>
-                <div className="border-r border-[#cddff6] p-3">Đặt phòng</div>
-              </div>
 
-              {filteredRooms.length === 0 && (
-                <div className="border-x border-b border-[#cddff6] p-4 text-[#595959]">
-                  Chỗ nghỉ này hiện không có loại phòng nào phù hợp với số đêm
-                  bạn đã chọn.
-                </div>
-              )}
+                {filteredRooms.length === 0 && (
+                  <div className="border-x border-b border-[#cddff6] p-4 text-[#595959]">
+                    Chỗ nghỉ này hiện không có loại phòng nào phù hợp với số đêm
+                    bạn đã chọn.
+                  </div>
+                )}
 
-              {filteredRooms.length > 0 && !hasAnyAvailableRoom && (
-                <div className="border-x border-b border-[#cddff6] bg-[#fff8f7] p-5 text-[#b42318]">
-                  Hiện tại khách sạn không còn phòng trống trong khoảng ngày bạn
-                  chọn. Vui lòng thay đổi ngày hoặc chọn chỗ nghỉ khác.
-                </div>
-              )}
+                {filteredRooms.length > 0 && !hasAnyAvailableRoom && (
+                  <div className="border-x border-b border-[#cddff6] bg-[#fff8f7] p-5 text-[#b42318]">
+                    Hiện tại khách sạn không còn phòng trống trong khoảng ngày
+                    bạn chọn. Vui lòng thay đổi ngày hoặc chọn chỗ nghỉ khác.
+                  </div>
+                )}
 
-              {hasAnyAvailableRoom &&
-                filteredRooms.map((item) => (
-                  <div
-                    key={item._id}
-                    className={`grid grid-cols-4 border-x border-b border-[#cddff6] ${
-                      item.available_quantity > 0
-                        ? "bg-white"
-                        : "bg-[#f7f8fa] text-[#8a94a6]"
-                    }`}
-                  >
-                    <div className="border-r border-r-[#cddff6] p-3">
-                      {(() => {
-                        const isExpanded = Boolean(
-                          expandedRoomDetails[item._id],
-                        );
-                        const roomBadges = Object.entries(
-                          item.badges || {},
-                        ).filter(([, value]) => value);
-                        const roomAmenities = Object.entries(
-                          item.amenities || {},
-                        ).filter(([, value]) => value);
-                        const visibleRoomBadges = isExpanded
-                          ? roomBadges
-                          : roomBadges.slice(0, 3);
-                        const visibleRoomAmenities = isExpanded
-                          ? roomAmenities
-                          : roomAmenities.slice(0, 4);
-                        const shouldShowToggle =
-                          roomBadges.length > 3 || roomAmenities.length > 4;
+                {hasAnyAvailableRoom &&
+                  filteredRooms.map((item) => (
+                    <div
+                      key={item._id}
+                      className={`grid grid-cols-4 border-x border-b border-[#cddff6] ${
+                        item.available_quantity > 0
+                          ? "bg-white"
+                          : "bg-[#f7f8fa] text-[#8a94a6]"
+                      }`}
+                    >
+                      <div className="border-r border-r-[#cddff6] p-3">
+                        {(() => {
+                          const isExpanded = Boolean(
+                            expandedRoomDetails[item._id],
+                          );
+                          const roomBadges = Object.entries(
+                            item.badges || {},
+                          ).filter(([, value]) => value);
+                          const roomAmenities = Object.entries(
+                            item.amenities || {},
+                          ).filter(([, value]) => value);
+                          const visibleRoomBadges = isExpanded
+                            ? roomBadges
+                            : roomBadges.slice(0, 3);
+                          const visibleRoomAmenities = isExpanded
+                            ? roomAmenities
+                            : roomAmenities.slice(0, 4);
+                          const shouldShowToggle =
+                            roomBadges.length > 3 || roomAmenities.length > 4;
 
-                        return (
-                          <>
-                            <span
-                              className={`block font-semibold ${
-                                item.available_quantity > 0
-                                  ? "text-[#006ce4]"
-                                  : "text-[#7a8599]"
-                              }`}
-                            >
-                              {item.name}
-                            </span>
-                            <span
-                              className={`block ${
-                                item.available_quantity > 0
-                                  ? "text-red-500"
-                                  : "font-medium text-[#b42318]"
-                              }`}
-                            >
-                              {item.available_quantity > 0
-                                ? `Còn ${item.available_quantity} phòng`
-                                : "Phòng hiện tại đã hết"}
-                            </span>
-                            <span className="mt-2 block">{item.bed_info}</span>
-                            <span className="block">{item.area} m²</span>
-                            <span className="block">{item.view}</span>
-                            {roomBadges.length > 0 && (
-                              <div className="mt-3">
-                                <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7a99]">
-                                  Điểm nổi bật
-                                </span>
-                                <div className="flex flex-wrap gap-2">
-                                  {visibleRoomBadges.map(([key]) => (
-                                    <span
-                                      key={key}
-                                      className="rounded-full bg-[#eef5ff] px-3 py-1 text-xs font-medium text-[#0b4ecb]"
-                                    >
-                                      {roomBadgeLabel[key] || key}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {roomAmenities.length > 0 && (
-                              <div className="mt-3">
-                                <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7a99]">
-                                  Tiện nghi
-                                </span>
-                                <div className="flex flex-wrap gap-2">
-                                  {visibleRoomAmenities.map(([key]) => (
-                                    <span
-                                      key={key}
-                                      className="rounded-full border border-[#dbe7ff] bg-white px-3 py-1 text-xs font-medium text-[#38506f]"
-                                    >
-                                      {roomAmenityLabel[key] || key}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {shouldShowToggle && (
-                              <button
-                                type="button"
-                                onClick={() => toggleRoomDetails(item._id)}
-                                className="mt-3 text-xs font-semibold text-[#0b4ecb] underline-offset-2 hover:underline"
+                          return (
+                            <>
+                              <span
+                                className={`block font-semibold ${
+                                  item.available_quantity > 0
+                                    ? "text-[#006ce4]"
+                                    : "text-[#7a8599]"
+                                }`}
                               >
-                                {isExpanded ? "Thu gọn" : "Xem thêm"}
-                              </button>
-                            )}
-                          </>
-                        );
-                      })()}
-                    </div>
+                                {item.name}
+                              </span>
+                              <span
+                                className={`block ${
+                                  item.available_quantity > 0
+                                    ? "text-red-500"
+                                    : "font-medium text-[#b42318]"
+                                }`}
+                              >
+                                {item.available_quantity > 0
+                                  ? `Còn ${item.available_quantity} phòng`
+                                  : "Phòng hiện tại đã hết"}
+                              </span>
+                              <span className="mt-2 block">
+                                {item.bed_info}
+                              </span>
+                              <span className="block">{item.area} m²</span>
+                              <span className="block">{item.view}</span>
+                              {roomBadges.length > 0 && (
+                                <div className="mt-3">
+                                  <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7a99]">
+                                    Điểm nổi bật
+                                  </span>
+                                  <div className="flex flex-wrap gap-2">
+                                    {visibleRoomBadges.map(([key]) => (
+                                      <span
+                                        key={key}
+                                        className="rounded-full bg-[#eef5ff] px-3 py-1 text-xs font-medium text-[#0b4ecb]"
+                                      >
+                                        {roomBadgeLabel[key] || key}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
 
-                    <div className="border-r border-r-[#cddff6] p-3">
-                      <span className="block">
-                        {appliedSearchParams.guest} khách ·{" "}
-                        {appliedSearchParams.room} phòng
-                      </span>
-                      <span className="mt-1 block text-sm text-[#595959]">
-                        Sức chứa tối đa:{" "}
-                        {item.capacity * appliedSearchParams.room} khách
-                      </span>
-                    </div>
+                              {roomAmenities.length > 0 && (
+                                <div className="mt-3">
+                                  <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7a99]">
+                                    Tiện nghi
+                                  </span>
+                                  <div className="flex flex-wrap gap-2">
+                                    {visibleRoomAmenities.map(([key]) => (
+                                      <span
+                                        key={key}
+                                        className="rounded-full border border-[#dbe7ff] bg-white px-3 py-1 text-xs font-medium text-[#38506f]"
+                                      >
+                                        {roomAmenityLabel[key] || key}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
 
-                    <div className="border-r border-r-[#cddff6] p-3">
-                      {item.total_original_price > 0 && (
-                        <span className="block text-red-500 line-through">
-                          VND{" "}
-                          {item.total_original_price?.toLocaleString("vi-VN")}
+                              {shouldShowToggle && (
+                                <button
+                                  type="button"
+                                  onClick={() => toggleRoomDetails(item._id)}
+                                  className="mt-3 text-xs font-semibold text-[#0b4ecb] underline-offset-2 hover:underline"
+                                >
+                                  {isExpanded ? "Thu gọn" : "Xem thêm"}
+                                </button>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
+
+                      <div className="border-r border-r-[#cddff6] p-3">
+                        <span className="block">
+                          {appliedSearchParams.guest} khách ·{" "}
+                          {appliedSearchParams.room} phòng
                         </span>
-                      )}
-
-                      <span className="block text-[24px] font-bold">
-                        VND {item.total_price?.toLocaleString("vi-VN")}
-                      </span>
-
-                      {item.discount_percent > 0 && (
-                        <span className="mt-2 inline-block rounded bg-primary px-2 py-1 text-white">
-                          Tiết kiệm {item.discount_percent}%
+                        <span className="mt-1 block text-sm text-[#595959]">
+                          Sức chứa tối đa:{" "}
+                          {item.capacity * appliedSearchParams.room} khách
                         </span>
-                      )}
-                    </div>
+                      </div>
 
-                    <div className="p-3">
-                      <button
-                        disabled={
-                          !item.can_book_selected_quantity ||
-                          !item.can_fit_selected_guests
-                        }
-                        onClick={() => handleCreateBooking(item)}
-                        className={`w-full rounded py-2 text-white transition ${
-                          item.can_book_selected_quantity &&
-                          item.can_fit_selected_guests
-                            ? "cursor-pointer bg-primary-2 hover:bg-primary"
-                            : "cursor-not-allowed bg-[#9eb5dc]"
-                        }`}
-                      >
-                        {item.can_book_selected_quantity &&
-                        item.can_fit_selected_guests
-                          ? "Đặt ngay"
-                          : item.available_quantity === 0
-                            ? "Đã hết phòng"
-                            : !item.can_book_selected_quantity
-                              ? `Không đủ ${appliedSearchParams.room} phòng`
-                              : "Không đủ sức chứa"}
-                      </button>
-
-                      {!item.can_book_selected_quantity ? (
-                        <span className="mt-2 block text-sm text-[#b42318]">
-                          {item.available_quantity === 0
-                            ? "Phòng hiện tại đã hết trong khoảng ngày bạn chọn."
-                            : `Hiện chỉ còn ${item.available_quantity} phòng trong khoảng ngày bạn chọn.`}
-                        </span>
-                      ) : null}
-
-                      {item.can_book_selected_quantity &&
-                        !item.can_fit_selected_guests && (
-                          <span className="mt-2 block text-sm text-[#b42318]">
-                            Loại phòng này không đủ sức chứa cho{" "}
-                            {appliedSearchParams.guest} khách với{" "}
-                            {appliedSearchParams.room} phòng.
+                      <div className="border-r border-r-[#cddff6] p-3">
+                        {item.total_original_price > 0 && (
+                          <span className="block text-red-500 line-through">
+                            VND{" "}
+                            {item.total_original_price?.toLocaleString("vi-VN")}
                           </span>
                         )}
+
+                        <span className="block text-[24px] font-bold">
+                          VND {item.total_price?.toLocaleString("vi-VN")}
+                        </span>
+
+                        {item.discount_percent > 0 && (
+                          <span className="mt-2 inline-block rounded bg-primary px-2 py-1 text-white">
+                            Tiết kiệm {item.discount_percent}%
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="p-3">
+                        <button
+                          disabled={
+                            !item.can_book_selected_quantity ||
+                            !item.can_fit_selected_guests
+                          }
+                          onClick={() => handleCreateBooking(item)}
+                          className={`w-full rounded py-2 text-white transition ${
+                            item.can_book_selected_quantity &&
+                            item.can_fit_selected_guests
+                              ? "cursor-pointer bg-primary-2 hover:bg-primary"
+                              : "cursor-not-allowed bg-[#9eb5dc]"
+                          }`}
+                        >
+                          {item.can_book_selected_quantity &&
+                          item.can_fit_selected_guests
+                            ? "Đặt ngay"
+                            : item.available_quantity === 0
+                              ? "Đã hết phòng"
+                              : !item.can_book_selected_quantity
+                                ? `Không đủ ${appliedSearchParams.room} phòng`
+                                : "Không đủ sức chứa"}
+                        </button>
+
+                        {!item.can_book_selected_quantity ? (
+                          <span className="mt-2 block text-sm text-[#b42318]">
+                            {item.available_quantity === 0
+                              ? "Phòng hiện tại đã hết trong khoảng ngày bạn chọn."
+                              : `Hiện chỉ còn ${item.available_quantity} phòng trong khoảng ngày bạn chọn.`}
+                          </span>
+                        ) : null}
+
+                        {item.can_book_selected_quantity &&
+                          !item.can_fit_selected_guests && (
+                            <span className="mt-2 block text-sm text-[#b42318]">
+                              Loại phòng này không đủ sức chứa cho{" "}
+                              {appliedSearchParams.guest} khách với{" "}
+                              {appliedSearchParams.room} phòng.
+                            </span>
+                          )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           </div>
