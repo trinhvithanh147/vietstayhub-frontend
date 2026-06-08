@@ -16,6 +16,7 @@ import AdminPage from "../pages/AdminPage/AdminPage";
 
 import HostDashboardPage from "../pages/HomePage/components/HostDashboardPage/HostDashboardPage";
 import MessagePage from "../pages/HomePage/components/MessagePage/MessagePage";
+import PaymentSuccessPage from "../pages/HomePage/components/PaymentSuccessPage/PaymentSuccessPage";
 
 const AppRoutes = () => {
   return (
@@ -37,6 +38,8 @@ const AppRoutes = () => {
       <Route path={path.loginSuccess} element={<LoginSuccess />} />
       <Route path={path.item} element={<PropertyCard />} />
       <Route path={path.message} element={<MessagePage />} />
+      <Route path="/payment-success" element={<PaymentSuccessPage />} />
+      <Route path="/payment-cancel" element={<PaymentSuccessPage />} />
     </Routes>
   );
 };

@@ -4,6 +4,7 @@ import Icon from "../../../assets/Icon/Icon";
 import flatVN from "../../../assets/images/Vn@3x.png";
 import { userService } from "../../../services/users.service";
 import { path } from "../../../hooks/path";
+import { validateRegister } from "../../../utils/validate";
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
