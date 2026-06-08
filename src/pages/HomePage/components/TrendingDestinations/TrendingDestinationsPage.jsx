@@ -64,7 +64,7 @@ const buildExploreLink = (item) => {
     rooms: "1",
   });
 
-  return `/properties/${item.city}?${params.toString()}`;
+  return `/${item.city}?${params.toString()}`;
 };
 
 const TrendingDestinationsPage = () => {

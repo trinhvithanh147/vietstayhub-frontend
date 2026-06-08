@@ -392,7 +392,7 @@ const CityProperties = () => {
 
             {!loading &&
               propertyCards.map((item) => {
-                const detailUrl = `/properties/${item.city}/${item.slug}${location.search}`;
+                const detailUrl = `/${item.city}/${item.slug}${location.search}`;
 
                 const visibleAmenities = Object.entries(item.amenities || {})
                   .filter(([, value]) => value)

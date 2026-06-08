@@ -110,7 +110,7 @@ const GuestFavoritesShowcase = () => {
         {favoriteProperties.map((item) => (
           <SwiperSlide key={item._id} className="h-auto pb-10">
             <Link
-              to={`/properties/${item.city}/${item.slug}`}
+              to={`/${item.city}`}
               className="group flex h-full min-h-[460px] flex-col overflow-hidden rounded-[22px] bg-white shadow-[0_14px_36px_rgba(15,23,42,0.08)] ring-1 ring-[#e6eefb] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_55px_rgba(15,23,42,0.14)] sm:rounded-[28px] md:min-h-[500px]"
             >
               <div className="relative h-[220px] overflow-hidden sm:h-[240px] md:h-[250px]">
