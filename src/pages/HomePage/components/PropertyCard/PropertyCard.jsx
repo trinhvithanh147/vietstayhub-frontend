@@ -202,7 +202,22 @@ const PropertyCard = () => {
     rating: averageRating,
     review_count: totalComment,
   };
+  const propertyLocation = newProperties?.location;
 
+  const hasPropertyLocation =
+    Number.isFinite(Number(propertyLocation?.lat)) &&
+    Number.isFinite(Number(propertyLocation?.lng));
+
+  const mapLat = Number(propertyLocation?.lat);
+  const mapLng = Number(propertyLocation?.lng);
+
+  const googleMapEmbedUrl = hasPropertyLocation
+    ? `https://www.google.com/maps?q=${mapLat},${mapLng}&z=16&output=embed`
+    : "";
+
+  const googleMapDirectionUrl = hasPropertyLocation
+    ? `https://www.google.com/maps/dir/?api=1&destination=${mapLat},${mapLng}`
+    : "";
   const propertyOwner =
     properties?.user_id && typeof properties.user_id === "object"
       ? properties.user_id
@@ -896,7 +911,85 @@ const PropertyCard = () => {
               </div>
             </div>
           </div>
+          <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.35fr]">
+            <div className="rounded-[28px] border border-[#dbe7ff] bg-white p-6 shadow-[0_10px_35px_rgba(0,59,149,0.06)]">
+              <span className="block text-24 text-primary">
+                Vị trí chỗ nghỉ
+              </span>
 
+              <div className="mt-4 flex items-start gap-3 rounded-2xl bg-[#f7fbff] p-4">
+                <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e8f2ff]">
+                  <Icon.localtion className="w-[20px] fill-[#006ce4]" />
+                </span>
+
+                <div>
+                  <span className="block text-[16px] font-semibold text-[#1f2f46]">
+                    {newProperties?.title}
+                  </span>
+
+                  <span className="mt-1 block text-[14px] leading-6 text-[#5f7291]">
+                    {newProperties?.address}, {newProperties?.country}
+                  </span>
+
+                  {hasPropertyLocation && (
+                    <span className="mt-2 block text-[13px] text-[#6b7a99]">
+                      Tọa độ: {mapLat}, {mapLng}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-5 space-y-3">
+                {hasPropertyLocation ? (
+                  <a
+                    href={googleMapDirectionUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex h-12 w-full items-center justify-center rounded-2xl bg-primary-2 text-[15px] font-semibold text-white transition hover:bg-primary"
+                  >
+                    Xem đường đi trên Google Maps
+                  </a>
+                ) : (
+                  <div className="rounded-2xl border border-[#ffe1b0] bg-[#fff8e6] px-4 py-3 text-[14px] leading-6 text-[#8a5a00]">
+                    Chỗ nghỉ này chưa có tọa độ bản đồ. Vui lòng cập nhật
+                    lat/lng trong dữ liệu khách sạn.
+                  </div>
+                )}
+
+                <div className="rounded-2xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3 text-[14px] leading-6 text-[#5f7291]">
+                  Bản đồ giúp bạn kiểm tra vị trí chỗ nghỉ, khu vực xung quanh
+                  và thuận tiện hơn khi di chuyển.
+                </div>
+              </div>
+            </div>
+
+            <div className="overflow-hidden rounded-[28px] border border-[#dbe7ff] bg-white shadow-[0_10px_35px_rgba(0,59,149,0.06)]">
+              {hasPropertyLocation ? (
+                <iframe
+                  title="property-google-map"
+                  src={googleMapEmbedUrl}
+                  className="h-[360px] w-full border-0"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              ) : (
+                <div className="flex h-[360px] flex-col items-center justify-center bg-[#f7fbff] px-8 text-center">
+                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#e8f2ff]">
+                    <Icon.localtion className="w-[28px] fill-[#006ce4]" />
+                  </span>
+
+                  <span className="mt-4 block text-[18px] font-semibold text-primary">
+                    Chưa có bản đồ
+                  </span>
+
+                  <span className="mt-2 block text-[14px] leading-6 text-[#5f7291]">
+                    Hãy thêm location.lat và location.lng cho chỗ nghỉ này để
+                    hiển thị Google Map.
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
           <div className="mt-6 rounded-[28px] border border-[#dbe7ff] bg-white p-6 shadow-[0_10px_35px_rgba(0,59,149,0.06)]">
             <span className="block text-24 text-primary">
               Tiện nghi nổi bật

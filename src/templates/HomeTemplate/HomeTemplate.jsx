@@ -3,6 +3,7 @@ import Header from "./Header/Header";
 import { Outlet } from "react-router-dom";
 import Footer from "./Footer/Footer";
 import ScrollToTop from "../../components/ScrollToTop/ScrollToTop";
+import AiStayAssistant from "../../pages/HomePage/components/AiStayAssistant/AiStayAssistant";
 
 const HomeTemplate = () => {
   return (
@@ -10,6 +11,7 @@ const HomeTemplate = () => {
       <Header />
       <ScrollToTop />
       <Outlet />
+      <AiStayAssistant />
       <Footer />
     </>
   );

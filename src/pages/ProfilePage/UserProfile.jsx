@@ -14,7 +14,9 @@ const getUserIdFromToken = () => {
     const payloadBase64 = accessToken.split(".")[1];
     if (!payloadBase64) return null;
 
-    const normalizedBase64 = payloadBase64.replace(/-/g, "+").replace(/_/g, "/");
+    const normalizedBase64 = payloadBase64
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
     const paddedBase64 = normalizedBase64.padEnd(
       normalizedBase64.length + ((4 - (normalizedBase64.length % 4)) % 4),
       "=",
@@ -59,7 +61,54 @@ const UserProfile = () => {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
+  const [passwordForm, setPasswordForm] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const handlePasswordChange = (field, value) => {
+    setPasswordForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
 
+    if (
+      !passwordForm.oldPassword ||
+      !passwordForm.newPassword ||
+      !passwordForm.confirmPassword
+    ) {
+      alert("Vui lòng nhập đầy đủ thông tin mật khẩu.");
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      alert("Mật khẩu xác nhận không khớp.");
+      return;
+    }
+
+    try {
+      setIsChangingPassword(true);
+      const res = await userService.changePassword(passwordForm);
+
+      alert(res?.data?.message || "Đổi mật khẩu thành công.");
+
+      setPasswordForm({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (err) {
+      console.log(err);
+      alert(err?.response?.data?.message || "Đổi mật khẩu thất bại.");
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [activeTab, setActiveTab] = useState("profile");
   useEffect(() => {
     if (!currentUserId) {
       navigate(path.login);
@@ -301,97 +350,228 @@ const UserProfile = () => {
                 Quay lại quản lý chỗ nghỉ
               </Link>
             </div>
+            <div className="mt-8 flex rounded-2xl border border-[#dbe7ff] bg-[#f7fbff] p-1">
+              <button
+                type="button"
+                onClick={() => setActiveTab("profile")}
+                className={`flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                  activeTab === "profile"
+                    ? "bg-white text-[#006ce4] shadow-[0_8px_20px_rgba(0,59,149,0.08)]"
+                    : "text-[#5b6b88] hover:text-[#003b95]"
+                }`}
+              >
+                Thông tin cá nhân
+              </button>
 
+              <button
+                type="button"
+                onClick={() => setActiveTab("password")}
+                className={`flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                  activeTab === "password"
+                    ? "bg-white text-[#006ce4] shadow-[0_8px_20px_rgba(0,59,149,0.08)]"
+                    : "text-[#5b6b88] hover:text-[#003b95]"
+                }`}
+              >
+                Đổi mật khẩu
+              </button>
+            </div>
             {loading ? (
               <div className="mt-8 rounded-[24px] border border-dashed border-[#c7d9f7] bg-[#f7fbff] px-6 py-10 text-center text-[#5b6b88]">
                 Đang tải thông tin user...
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-[13px] font-semibold tracking-[0.04em] text-[#375070]">
-                      Họ và tên
-                    </label>
-                    <input
-                      value={form.full_name}
-                      onChange={(e) =>
-                        handleChange("full_name", e.target.value)
-                      }
-                      className="h-13 w-full rounded-2xl border border-[#c9d8ef] bg-[#fbfdff] px-4 outline-none transition focus:border-[#006ce4] focus:bg-white"
-                    />
-                  </div>
+              <>
+                {activeTab === "profile" && (
+                  <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                    <div className="grid gap-5 md:grid-cols-2">
+                      <div>
+                        <label className="mb-2 block text-[13px] font-semibold tracking-[0.04em] text-[#375070]">
+                          Họ và tên
+                        </label>
+                        <input
+                          value={form.full_name}
+                          onChange={(e) =>
+                            handleChange("full_name", e.target.value)
+                          }
+                          className="h-13 w-full rounded-2xl border border-[#c9d8ef] bg-[#fbfdff] px-4 outline-none transition focus:border-[#006ce4] focus:bg-white"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="mb-2 block text-[13px] font-semibold tracking-[0.04em] text-[#375070]">
-                      Email
-                    </label>
-                    <input
-                      value={user?.email || ""}
-                      disabled
-                      className="h-13 w-full rounded-2xl border border-[#dbe7ff] bg-[#f4f7fc] px-4 text-[#5b6b88] outline-none"
-                    />
-                  </div>
-                </div>
+                      <div>
+                        <label className="mb-2 block text-[13px] font-semibold tracking-[0.04em] text-[#375070]">
+                          Email
+                        </label>
+                        <input
+                          value={user?.email || ""}
+                          disabled
+                          className="h-13 w-full rounded-2xl border border-[#dbe7ff] bg-[#f4f7fc] px-4 text-[#5b6b88] outline-none"
+                        />
+                      </div>
+                    </div>
 
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-[13px] font-semibold tracking-[0.04em] text-[#375070]">
-                      Số điện thoại
-                    </label>
-                    <input
-                      value={form.phone_number}
-                      onChange={(e) =>
-                        handleChange("phone_number", e.target.value)
-                      }
-                      className="h-13 w-full rounded-2xl border border-[#c9d8ef] bg-[#fbfdff] px-4 outline-none transition focus:border-[#006ce4] focus:bg-white"
-                      placeholder="Nhập số điện thoại"
-                    />
-                  </div>
+                    <div className="grid gap-5 md:grid-cols-2">
+                      <div>
+                        <label className="mb-2 block text-[13px] font-semibold tracking-[0.04em] text-[#375070]">
+                          Số điện thoại
+                        </label>
+                        <input
+                          value={form.phone_number}
+                          onChange={(e) =>
+                            handleChange("phone_number", e.target.value)
+                          }
+                          className="h-13 w-full rounded-2xl border border-[#c9d8ef] bg-[#fbfdff] px-4 outline-none transition focus:border-[#006ce4] focus:bg-white"
+                          placeholder="Nhập số điện thoại"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="mb-2 block text-[13px] font-semibold tracking-[0.04em] text-[#375070]">
-                      Giới tính
-                    </label>
-                    <select
-                      value={form.gender}
-                      onChange={(e) => handleChange("gender", e.target.value)}
-                      className="h-13 w-full rounded-2xl border border-[#c9d8ef] bg-[#fbfdff] px-4 outline-none transition focus:border-[#006ce4] focus:bg-white"
-                    >
-                      {genderOptions.map((item) => (
-                        <option key={item.value} value={item.value}>
-                          {item.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+                      <div>
+                        <label className="mb-2 block text-[13px] font-semibold tracking-[0.04em] text-[#375070]">
+                          Giới tính
+                        </label>
+                        <select
+                          value={form.gender}
+                          onChange={(e) =>
+                            handleChange("gender", e.target.value)
+                          }
+                          className="h-13 w-full rounded-2xl border border-[#c9d8ef] bg-[#fbfdff] px-4 outline-none transition focus:border-[#006ce4] focus:bg-white"
+                        >
+                          {genderOptions.map((item) => (
+                            <option key={item.value} value={item.value}>
+                              {item.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
 
-                <div>
-                  <label className="mb-2 block text-[13px] font-semibold tracking-[0.04em] text-[#375070]">
-                    Địa chỉ nhà
-                  </label>
-                  <textarea
-                    rows={5}
-                    value={form.home_address}
-                    onChange={(e) =>
-                      handleChange("home_address", e.target.value)
-                    }
-                    className="w-full rounded-2xl border border-[#c9d8ef] bg-[#fbfdff] px-4 py-3 outline-none transition focus:border-[#006ce4] focus:bg-white"
-                    placeholder="Nhập địa chỉ nhà của bạn"
-                  />
-                </div>
+                    <div>
+                      <label className="mb-2 block text-[13px] font-semibold tracking-[0.04em] text-[#375070]">
+                        Địa chỉ nhà
+                      </label>
+                      <textarea
+                        rows={5}
+                        value={form.home_address}
+                        onChange={(e) =>
+                          handleChange("home_address", e.target.value)
+                        }
+                        className="w-full rounded-2xl border border-[#c9d8ef] bg-[#fbfdff] px-4 py-3 outline-none transition focus:border-[#006ce4] focus:bg-white"
+                        placeholder="Nhập địa chỉ nhà của bạn"
+                      />
+                    </div>
 
-                <div className="flex flex-wrap gap-3 pt-2">
-                  <button
-                    type="submit"
-                    disabled={isSaving}
-                    className="rounded-2xl bg-primary-2 px-6 py-3 text-[15px] font-semibold text-white shadow-[0_14px_30px_rgba(0,108,228,0.26)] transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70"
+                    <div className="flex flex-wrap gap-3 pt-2">
+                      <button
+                        type="submit"
+                        disabled={isSaving}
+                        className="rounded-2xl bg-primary-2 px-6 py-3 text-[15px] font-semibold text-white shadow-[0_14px_30px_rgba(0,108,228,0.26)] transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70"
+                      >
+                        {isSaving ? "Đang cập nhật..." : "Cập nhật thông tin"}
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {activeTab === "password" && (
+                  <form
+                    onSubmit={handleChangePassword}
+                    className="mt-8 space-y-5"
                   >
-                    {isSaving ? "Đang cập nhật..." : "Cập nhật thông tin"}
-                  </button>
-                </div>
-              </form>
+                    <div className="rounded-[28px] border border-[#dbe7ff] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] p-6 shadow-[0_14px_34px_rgba(0,59,149,0.06)]">
+                      <div className="mb-6">
+                        <span className="inline-flex rounded-full bg-[#e8f2ff] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#006ce4]">
+                          Bảo mật tài khoản
+                        </span>
+
+                        <h2 className="mt-3 text-[26px] font-bold text-[#10357b]">
+                          Đổi mật khẩu
+                        </h2>
+
+                        <p className="mt-2 text-[15px] leading-7 text-[#5b6b88]">
+                          Cập nhật mật khẩu mới để bảo vệ tài khoản và thông tin
+                          đặt phòng của bạn.
+                        </p>
+                      </div>
+
+                      <div className="space-y-5">
+                        <div>
+                          <label className="mb-2 block text-[13px] font-semibold tracking-[0.04em] text-[#375070]">
+                            Mật khẩu hiện tại
+                          </label>
+
+                          <input
+                            type="password"
+                            value={passwordForm.oldPassword}
+                            onChange={(e) =>
+                              handlePasswordChange(
+                                "oldPassword",
+                                e.target.value,
+                              )
+                            }
+                            className="h-13 w-full rounded-2xl border border-[#c9d8ef] bg-white px-4 text-[#1f2f46] outline-none transition focus:border-[#006ce4] focus:ring-4 focus:ring-[#006ce4]/10"
+                            placeholder="Nhập mật khẩu hiện tại"
+                          />
+                        </div>
+
+                        <div className="grid gap-5 md:grid-cols-2">
+                          <div>
+                            <label className="mb-2 block text-[13px] font-semibold tracking-[0.04em] text-[#375070]">
+                              Mật khẩu mới
+                            </label>
+
+                            <input
+                              type="password"
+                              value={passwordForm.newPassword}
+                              onChange={(e) =>
+                                handlePasswordChange(
+                                  "newPassword",
+                                  e.target.value,
+                                )
+                              }
+                              className="h-13 w-full rounded-2xl border border-[#c9d8ef] bg-white px-4 text-[#1f2f46] outline-none transition focus:border-[#006ce4] focus:ring-4 focus:ring-[#006ce4]/10"
+                              placeholder="Nhập mật khẩu mới"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="mb-2 block text-[13px] font-semibold tracking-[0.04em] text-[#375070]">
+                              Xác nhận mật khẩu mới
+                            </label>
+
+                            <input
+                              type="password"
+                              value={passwordForm.confirmPassword}
+                              onChange={(e) =>
+                                handlePasswordChange(
+                                  "confirmPassword",
+                                  e.target.value,
+                                )
+                              }
+                              className="h-13 w-full rounded-2xl border border-[#c9d8ef] bg-white px-4 text-[#1f2f46] outline-none transition focus:border-[#006ce4] focus:ring-4 focus:ring-[#006ce4]/10"
+                              placeholder="Nhập lại mật khẩu mới"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="rounded-2xl border border-[#dbe7ff] bg-white px-4 py-4 text-[14px] leading-6 text-[#5b6b88]">
+                          Mật khẩu nên có ít nhất 6 ký tự. Không nên dùng lại
+                          mật khẩu cũ hoặc các thông tin dễ đoán như ngày sinh,
+                          số điện thoại.
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={isChangingPassword}
+                          className="rounded-2xl bg-primary-2 px-6 py-3 text-[15px] font-semibold text-white shadow-[0_14px_30px_rgba(0,108,228,0.24)] transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                          {isChangingPassword
+                            ? "Đang đổi mật khẩu..."
+                            : "Đổi mật khẩu"}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                )}
+              </>
             )}
           </section>
         </div>

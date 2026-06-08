@@ -1004,7 +1004,7 @@ const HostDashboardPage = () => {
             <SectionHeader
               title="Đặt phòng của tôi"
               count={myBooking.length}
-              description="Các đơn bạn đã đặt được tách riêng khỏi khu quản lý chỗ nghỉ."
+              description="Theo dõi các đơn đặt phòng của bạn, bao gồm trạng thái, thời gian lưu trú và thông tin chỗ nghỉ."
               isOpen={showMyBooking}
               onToggle={() => setShowMyBooking((prev) => !prev)}
             />

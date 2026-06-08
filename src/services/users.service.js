@@ -34,6 +34,9 @@ export const userService = {
   update: (id, data) => {
     return http.patch(`/users/update/${id}`, data);
   },
+  changePassword: (data) => {
+    return http.patch("/users/change-password", data);
+  },
   uploadCloud: (formData) => {
     return http.patch("/users/avatar/cloud", formData, {
       headers: {

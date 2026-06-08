@@ -543,17 +543,21 @@ const Header = () => {
                   </>
                 ) : (
                   <>
-                    <Link to={path.register}>
-                      <ButtonCustom className="bg-white px-3 py-1 font-medium text-[#006ce4] hover:bg-primary-2 hover:opacity-90">
+                    <>
+                      <Link
+                        to={path.register}
+                        className="rounded-full bg-white px-5 py-2 text-[14px] font-semibold text-[#006ce4] shadow-[0_8px_20px_rgba(0,0,0,0.12)] transition duration-200 hover:-translate-y-[1px] hover:bg-[#f2f7ff]"
+                      >
                         Đăng ký
-                      </ButtonCustom>
-                    </Link>
+                      </Link>
 
-                    <Link to={path.login}>
-                      <ButtonCustom className="bg-white px-3 py-1 font-medium text-[#006ce4] hover:bg-primary-2 hover:opacity-90">
+                      <Link
+                        to={path.login}
+                        className="rounded-full border border-white/60 px-5 py-2 text-[14px] font-semibold text-white transition duration-200 hover:-translate-y-[1px] hover:bg-white/10"
+                      >
                         Đăng nhập
-                      </ButtonCustom>
-                    </Link>
+                      </Link>
+                    </>
                   </>
                 )}
               </div>
