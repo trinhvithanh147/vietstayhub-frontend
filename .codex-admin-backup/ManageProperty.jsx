@@ -1,19 +1,20 @@
+/* eslint-disable no-irregular-whitespace */
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import proPertiesService from "../../../services/properties.service";
 import { userService } from "../../../services/users.service";
 
 const propertyAmenityFields = [
-  ["outdoor_pool", "Hồ bơi ngoài trời"],
-  ["free_wifi", "WiFi miễn phí"],
-  ["airport_shuttle", "Xe đưa đón sân bay"],
-  ["non_smoking_room", "Phòng không hút thuốc"],
-  ["room_service", "Dịch vụ phòng"],
-  ["restaurant", "Nhà hàng"],
-  ["free_parking", "Chỗ đậu xe miễn phí"],
-  ["family_room", "Phòng gia đình"],
-  ["bar", "Quầy bar"],
-  ["breakfast", "Bữa sáng"],
+  ["outdoor_pool", "H? boi ngo�i tr?i"],
+  ["free_wifi", "WiFi mi?n ph�"],
+  ["airport_shuttle", "Xe dua d�n s�n bay"],
+  ["non_smoking_room", "Ph�ng kh�ng h�t thu?c"],
+  ["room_service", "D?ch v? ph�ng"],
+  ["restaurant", "Nh� h�ng"],
+  ["free_parking", "Ch? d?u xe mi?n ph�"],
+  ["family_room", "Ph�ng gia d�nh"],
+  ["bar", "Qu?y bar"],
+  ["breakfast", "B?a s�ng"],
 ];
 
 const createInitialForm = () => ({
@@ -112,6 +113,17 @@ const ManageProperty = () => {
     return { total, preferred };
   }, [items]);
 
+  const getOwnerName = (property) => {
+    if (!property?.user_id) return "Chua g?n ch? s? h?u";
+
+    if (typeof property.user_id === "object") {
+      return property.user_id?.full_name || property.user_id?.email || "Chua r�";
+    }
+
+    const owner = users.find((user) => user._id === property.user_id);
+    return owner?.full_name || owner?.email || "Kh�ng t�m th?y";
+  };
+
   const groupedProperties = useMemo(() => {
     return items.reduce((groups, property) => {
       const rawUser = property.user_id;
@@ -126,7 +138,7 @@ const ManageProperty = () => {
       const ownerName =
         matchedUser?.full_name ||
         matchedUser?.email ||
-        "Chưa gắn chủ sở hữu";
+        "Chua g?n ch? s? h?u";
       const ownerEmail = matchedUser?.email || "";
 
       if (!groups[ownerId]) {
@@ -151,7 +163,7 @@ const ManageProperty = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Xóa chỗ nghỉ này?")) return;
+    if (!window.confirm("X�a ch? ngh? n�y?")) return;
     try {
       await proPertiesService.delete(id);
       if (editingId === id) handleReset();
@@ -212,7 +224,7 @@ const ManageProperty = () => {
 
   const handleSubmit = async () => {
     if (!form.user_id) {
-      alert("Vui lòng chọn chủ sở hữu cho chỗ nghỉ");
+      alert("Vui l�ng ch?n ch? s? h?u cho ch? ngh?");
       return;
     }
 
@@ -264,23 +276,23 @@ const ManageProperty = () => {
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h2 className="text-[22px] font-bold text-[#0b2f6a]">
-            Quản lý chỗ nghỉ
+            Qu?n l� ch? ngh?
           </h2>
           <p className="mt-1 text-sm text-[#5b6b86]">
-            Danh sách khách sạn / chỗ nghỉ (admin).
+            Danh s�ch kh�ch s?n / ch? ngh? (admin).
           </p>
         </div>
 
         <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
           <div className="rounded-2xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3">
-            <div className="text-xs font-semibold text-[#6a7da5]">Tổng</div>
+            <div className="text-xs font-semibold text-[#6a7da5]">T?ng</div>
             <div className="text-xl font-bold text-[#0b2f6a]">
               {totals.total}
             </div>
           </div>
           <div className="rounded-2xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3">
             <div className="text-xs font-semibold text-[#6a7da5]">
-              Nổi bật
+              N?i b?t
             </div>
             <div className="text-xl font-bold text-[#0b2f6a]">
               {totals.preferred}
@@ -291,7 +303,7 @@ const ManageProperty = () => {
             onClick={load}
             className="col-span-2 h-11 rounded-2xl border border-[#dbe7ff] bg-white px-4 text-sm font-semibold text-[#0b2f6a] hover:bg-[#f6faff] sm:col-span-1"
           >
-            Tải lại
+            T?i l?i
           </button>
         </div>
       </div>
@@ -300,11 +312,11 @@ const ManageProperty = () => {
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <h3 className="text-lg font-bold text-[#0b2f6a]">
-              {editingId ? "Cập nhật chỗ nghỉ" : "Tạo chỗ nghỉ mới"}
+              {editingId ? "C?p nh?t ch? ngh?" : "T?o ch? ngh? m?i"}
             </h3>
             <p className="mt-1 text-sm text-[#5b6b86]">
-              Admin có thể tạo chỗ nghỉ, gắn chủ sở hữu và chỉnh sửa thông tin
-              chi tiết.
+              Admin c� th? t?o ch? ngh?, g?n ch? s? h?u v� ch?nh s?a th�ng tin
+              chi ti?t.
             </p>
           </div>
           <div className="grid w-full grid-cols-1 gap-2 sm:w-auto sm:grid-cols-2">
@@ -313,21 +325,21 @@ const ManageProperty = () => {
               onClick={handleSubmit}
               className="h-11 rounded-2xl bg-[#006ce4] px-4 text-sm font-semibold text-white hover:bg-[#003b95]"
             >
-              {editingId ? "Cập nhật chỗ nghỉ" : "Tạo chỗ nghỉ"}
+              {editingId ? "C?p nh?t ch? ngh?" : "T?o ch? ngh?"}
             </button>
             <button
               type="button"
               onClick={handleReset}
               className="h-11 rounded-2xl border border-[#dbe7ff] bg-white px-4 text-sm font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
             >
-              Làm mới
+              L�m m?i
             </button>
           </div>
         </div>
 
         {users.length === 0 && (
           <div className="mt-4 rounded-2xl border border-[#ffe1b5] bg-[#fff9ef] px-4 py-3 text-sm text-[#8a5a00]">
-            Chưa tải được danh sách user. Không thể gắn chủ sở hữu cho chỗ nghỉ.
+            Chua t?i du?c danh s�ch user. Kh�ng th? g?n ch? s? h?u cho ch? ngh?.
           </div>
         )}
 
@@ -336,7 +348,7 @@ const ManageProperty = () => {
             name="title"
             value={form.title}
             onChange={handleChange}
-            placeholder="Tên chỗ nghỉ"
+            placeholder="T�n ch? ngh?"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
           <input
@@ -350,7 +362,7 @@ const ManageProperty = () => {
             name="address"
             value={form.address}
             onChange={handleChange}
-            placeholder="Địa chỉ"
+            placeholder="�?a ch?"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
           <select
@@ -370,7 +382,7 @@ const ManageProperty = () => {
             name="country"
             value={form.country}
             onChange={handleChange}
-            placeholder="Quốc gia"
+            placeholder="Qu?c gia"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
 
@@ -378,7 +390,7 @@ const ManageProperty = () => {
             name="base_price"
             value={form.base_price}
             onChange={handleChange}
-            placeholder="Giá cơ bản"
+            placeholder="Gi� co b?n"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4] xl:col-span-2"
           />
 
@@ -389,7 +401,7 @@ const ManageProperty = () => {
             required
             className="order-first h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4] md:col-span-2 xl:col-span-4"
           >
-            <option value="">Chọn chủ chỗ nghỉ</option>
+            <option value="">Ch?n ch? ch? ngh?</option>
             {users.map((user) => (
               <option key={user._id} value={user._id}>
                 {user.full_name} - {user.email}
@@ -408,21 +420,21 @@ const ManageProperty = () => {
               onChange={handleChange}
               className="h-4 w-4"
             />
-            <span>Chỗ nghỉ nổi bật</span>
+            <span>Ch? ngh? n?i b?t</span>
           </label>
 
           <input
             name="max_stay_days"
             value={form.max_stay_days}
             onChange={handleChange}
-            placeholder="Số đêm tối đa"
+            placeholder="S? d�m t?i da"
             className="h-12 w-full rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
         </div>
 
         <div className="mt-4 rounded-2xl border border-[#dbe7ff] bg-white p-4">
           <div className="mb-3 text-sm font-semibold text-[#0b2f6a]">
-            Tiện nghi
+            Ti?n nghi
           </div>
 
           <div className="grid gap-3 md:grid-cols-2">
@@ -447,13 +459,13 @@ const ManageProperty = () => {
           name="description"
           value={form.description}
           onChange={handleChange}
-          placeholder="Mô tả"
+          placeholder="M� t?"
           className="mt-4 min-h-[110px] w-full rounded-2xl border border-[#dbe7ff] bg-white px-4 py-3 outline-none focus:border-[#006ce4]"
         />
 
         <div className="mt-4 rounded-2xl border border-[#dbe7ff] bg-white p-4">
           <div className="text-sm font-semibold text-[#0b2f6a]">
-            Ảnh chính (chọn từ máy)
+            ?nh ch�nh (ch?n t? m�y)
           </div>
           <input
             key={`admin-main-image-${propertyImageInputKey}`}
@@ -464,16 +476,16 @@ const ManageProperty = () => {
           />
           <div className="mt-2 text-xs text-[#6a7da5]">
             {mainImageFile
-              ? `Đã chọn: ${mainImageFile.name}`
+              ? `�� ch?n: ${mainImageFile.name}`
               : form.main_image_url
-              ? "Chưa chọn file mới. Giữ ảnh chính hiện tại."
-              : "Chưa có ảnh chính."}
+              ? "Chua ch?n file m?i. Gi? ?nh ch�nh hi?n t?i."
+              : "Chua c� ?nh ch�nh."}
           </div>
         </div>
 
         <div className="mt-4 rounded-2xl border border-[#dbe7ff] bg-white p-4">
           <div className="text-sm font-semibold text-[#0b2f6a]">
-            Danh sách ảnh (chọn nhiều ảnh)
+            Danh s�ch ?nh (ch?n nhi?u ?nh)
           </div>
           <input
             key={`admin-gallery-image-${propertyImageInputKey}`}
@@ -487,10 +499,10 @@ const ManageProperty = () => {
           />
           <div className="mt-2 text-xs text-[#6a7da5]">
             {galleryImageFiles.length > 0
-              ? `Đã chọn ${galleryImageFiles.length} ảnh mới`
-              : `Chưa chọn ảnh mới. Gallery hiện tại: ${
+              ? `�� ch?n ${galleryImageFiles.length} ?nh m?i`
+              : `Chua ch?n ?nh m?i. Gallery hi?n t?i: ${
                   (form.gallery_urls || "").split("\n").filter(Boolean).length
-                } ảnh`}
+                } ?nh`}
           </div>
         </div>
       </div>
@@ -498,28 +510,28 @@ const ManageProperty = () => {
       <div className="mt-6 overflow-hidden rounded-2xl border border-[#edf3ff]">
         <div className="flex flex-col gap-3 bg-[#f8fbff] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-sm font-semibold text-[#0b2f6a]">
-            Danh sách chỗ nghỉ
+            Danh s�ch ch? ngh?
           </span>
           <button
             type="button"
             onClick={() => setShowPropertyList((prev) => !prev)}
             className="rounded-xl border border-[#dbe7ff] bg-white px-4 py-2 text-xs font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
           >
-            {showPropertyList ? "Thu gọn danh sách" : "Mở danh sách"}
+            {showPropertyList ? "Thu g?n danh s�ch" : "M? danh s�ch"}
           </button>
         </div>
 
         {!showPropertyList ? (
           <div className="px-4 py-8 text-sm text-[#5b6b86]">
-            Danh sách chỗ nghỉ đang được thu gọn.
+            Danh s�ch ch? ngh? dang du?c thu g?n.
           </div>
         ) : loading ? (
           <div className="px-4 py-8 text-sm text-[#5b6b86]">
-            Đang tải dữ liệu...
+            �ang t?i d? li?u...
           </div>
         ) : items.length === 0 ? (
           <div className="px-4 py-8 text-sm text-[#5b6b86]">
-            Không có chỗ nghỉ.
+            Kh�ng c� ch? ngh?.
           </div>
         ) : (
           <div className="space-y-4 px-4 py-4">
@@ -537,7 +549,7 @@ const ManageProperty = () => {
                         {group.ownerName}
                       </div>
                       <div className="mt-1 text-xs text-[#6a7da5]">
-                        {group.ownerEmail || "Chưa có email"} • {group.properties.length} chỗ nghỉ
+                        {group.ownerEmail || "Chua c� email"} � {group.properties.length} ch? ngh?
                       </div>
                     </div>
                     <button
@@ -545,13 +557,13 @@ const ManageProperty = () => {
                       onClick={() => toggleOwnerGroup(group.ownerId)}
                       className="rounded-xl border border-[#dbe7ff] bg-white px-4 py-2 text-xs font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
                     >
-                      {isCollapsed ? "Mở chỗ nghỉ" : "Thu gọn chỗ nghỉ"}
+                      {isCollapsed ? "M? ch? ngh?" : "Thu g?n ch? ngh?"}
                     </button>
                   </div>
 
                   {isCollapsed ? (
                     <div className="px-4 py-6 text-sm text-[#5b6b86]">
-                      Nhóm chỗ nghỉ này đang được thu gọn.
+                      Nh�m ch? ngh? n�y dang du?c thu g?n.
                     </div>
                   ) : (
                     <>
@@ -565,25 +577,27 @@ const ManageProperty = () => {
                             <div className="mt-1 break-words text-xs text-[#6a7da5]">
                               {p.address || ""}
                             </div>
-                            <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
+                            <div className="mt-3 grid grid-cols-2 gap-3 text-xs text-[#5b6b86]">
                               <div>
                                 <span className="block font-semibold text-[#6a7da5]">
-                                  Thành phố
+                                  Th�nh ph?
                                 </span>
-                                <span className="mt-1 block">{p.city || "-"}</span>
+                                <span className="mt-1 block text-[#0b2f6a]">
+                                  {p.city || "-"}
+                                </span>
                               </div>
                               <div>
                                 <span className="block font-semibold text-[#6a7da5]">
-                                  Giá
+                                  Gi�
                                 </span>
-                                <span className="mt-1 block">
+                                <span className="mt-1 block text-[#0b2f6a]">
                                   {(p.base_price || 0).toLocaleString("vi-VN")} VND
                                 </span>
                               </div>
                             </div>
                             <div className="mt-3">
-                              <span className="inline-flex rounded-full border border-[#dbe7ff] bg-[#f6faff] px-3 py-1 text-xs font-semibold">
-                                Nổi bật: {p.is_preferred ? "Có" : "Không"}
+                              <span className="inline-flex rounded-full border border-[#dbe7ff] bg-[#f6faff] px-3 py-1 text-xs font-semibold text-[#0b2f6a]">
+                                N?i b?t: {p.is_preferred ? "C�" : "Kh�ng"}
                               </span>
                             </div>
                             <div className="mt-4 grid grid-cols-3 gap-2">
@@ -592,20 +606,20 @@ const ManageProperty = () => {
                                 onClick={() => handleEdit(p)}
                                 className="h-10 rounded-xl bg-[#006ce4] px-3 text-xs font-semibold text-white hover:bg-[#003b95]"
                               >
-                                Sửa
+                                S?a
                               </button>
                               <Link
                                 to={`/properties/${p.city}/${p.slug}`}
-                                className="flex h-10 items-center justify-center rounded-xl border border-[#dbe7ff] bg-white px-3 text-xs font-semibold hover:bg-[#f6faff]"
+                                className="flex h-10 items-center justify-center rounded-xl border border-[#dbe7ff] bg-white px-3 text-xs font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
                               >
-                                Mở
+                                M?
                               </Link>
                               <button
                                 type="button"
                                 onClick={() => handleDelete(p._id)}
                                 className="h-10 rounded-xl border border-[#ffd0d0] bg-[#fff5f5] px-3 text-xs font-semibold text-[#b42318] hover:bg-[#ffecec]"
                               >
-                                Xóa
+                                X�a
                               </button>
                             </div>
                           </div>
@@ -614,19 +628,19 @@ const ManageProperty = () => {
 
                       <div className="hidden overflow-x-auto lg:block">
                         <div className="min-w-[820px]">
-                      <div className="grid grid-cols-[1.3fr_0.7fr_0.7fr_0.7fr_0.7fr] gap-3 bg-[#f8fbff] px-4 py-3 text-xs font-semibold tracking-[0.06em] text-[#6a7da5]">
-                        <div>Tên chỗ nghỉ</div>
-                        <div>Thành phố</div>
-                        <div>Giá</div>
-                        <div>Nổi bật</div>
-                        <div>Hành động</div>
+                      <div className="grid grid-cols-[1.2fr_0.7fr_0.7fr_0.7fr_0.7fr] gap-3 bg-[#f8fbff] px-4 py-3 text-xs font-semibold tracking-[0.06em] text-[#6a7da5]">
+                        <div>T�n ch? ngh?</div>
+                        <div>Th�nh ph?</div>
+                        <div>Gi�</div>
+                        <div>N?i b?t</div>
+                        <div>H�nh d?ng</div>
                       </div>
 
                       <div className="divide-y divide-[#edf3ff]">
                         {group.properties.map((p) => (
                           <div
                             key={p._id}
-                            className="grid grid-cols-[1.3fr_0.7fr_0.7fr_0.7fr_0.7fr] gap-3 px-4 py-4 text-sm text-[#0b2f6a]"
+                            className="grid grid-cols-[1.2fr_0.7fr_0.7fr_0.7fr_0.7fr] gap-3 px-4 py-4 text-sm text-[#0b2f6a]"
                           >
                             <div className="min-w-0">
                               <div className="truncate font-semibold">{p.title || "-"}</div>
@@ -646,7 +660,7 @@ const ManageProperty = () => {
 
                             <div>
                               <span className="inline-flex rounded-full border border-[#dbe7ff] bg-[#f6faff] px-3 py-1 text-xs font-semibold text-[#0b2f6a]">
-                                {p.is_preferred ? "Có" : "Không"}
+                                {p.is_preferred ? "C�" : "Kh�ng"}
                               </span>
                             </div>
 
@@ -656,14 +670,14 @@ const ManageProperty = () => {
                                 onClick={() => handleEdit(p)}
                                 className="h-9 rounded-xl bg-[#006ce4] px-3 text-xs font-semibold text-white hover:bg-[#003b95]"
                               >
-                                Sửa
+                                S?a
                               </button>
 
                               <Link
                                 to={`/properties/${p.city}/${p.slug}`}
                                 className="flex h-9 items-center rounded-xl border border-[#dbe7ff] bg-white px-3 text-xs font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
                               >
-                                Mở
+                                M?
                               </Link>
 
                               <button
@@ -671,7 +685,7 @@ const ManageProperty = () => {
                                 onClick={() => handleDelete(p._id)}
                                 className="h-9 rounded-xl border border-[#ffd0d0] bg-[#fff5f5] px-3 text-xs font-semibold text-[#b42318] hover:bg-[#ffecec]"
                               >
-                                Xóa
+                                X�a
                               </button>
                             </div>
                           </div>

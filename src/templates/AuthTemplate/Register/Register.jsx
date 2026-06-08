@@ -24,21 +24,27 @@ const Register = () => {
   };
 
   const handleRegister = async () => {
-    try {
-      if (form.password !== form.confirmPassword) {
-        alert("Mật khẩu không khớp");
-        return;
-      }
+    const errorMessage = validateRegister(form, {
+      requireConfirmPassword: true,
+    });
 
+    if (errorMessage) {
+      alert(errorMessage);
+      return;
+    }
+
+    try {
       await userService.create({
-        full_name: form.full_name,
-        email: form.email,
+        full_name: form.full_name.trim(),
+        email: form.email.trim().toLowerCase(),
         password: form.password,
       });
 
+      alert("Đăng ký thành công.");
       navigate(path.login);
     } catch (err) {
       console.log(err);
+      alert(err?.response?.data?.message || "Đăng ký thất bại.");
     }
   };
 
@@ -144,7 +150,7 @@ const Register = () => {
                   value={form.email}
                   onChange={handleChange}
                   name="email"
-                  type="text"
+                  type="email"
                   placeholder="Nhập địa chỉ email của bạn"
                   className="h-13 w-full rounded-2xl border border-[#c9d8ef] bg-[#fbfdff] px-4 outline-none transition focus:border-[#006ce4] focus:bg-white"
                 />
@@ -180,6 +186,7 @@ const Register = () => {
             </div>
 
             <button
+              type="button"
               onClick={handleRegister}
               className="mt-8 h-13 w-full cursor-pointer rounded-2xl bg-primary-2 px-4 text-base font-semibold text-white shadow-[0_14px_30px_rgba(0,108,228,0.26)] transition hover:bg-primary"
             >
@@ -187,7 +194,9 @@ const Register = () => {
             </button>
 
             <button
-              onClick={() => (window.location.href = `${apiBaseUrl}/auth/google`)}
+              onClick={() =>
+                (window.location.href = `${apiBaseUrl}/auth/google`)
+              }
               className="mt-4 flex h-14 w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border border-[#d9e2f1] bg-white font-semibold text-secondary transition hover:border-[#006ce4] hover:bg-[#f6faff]"
             >
               <Icon.google />

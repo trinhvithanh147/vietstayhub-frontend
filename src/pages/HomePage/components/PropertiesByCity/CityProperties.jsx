@@ -1,6 +1,12 @@
 import { differenceInCalendarDays, format } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { path } from "../../../../hooks/path";
 import proPertiesService from "../../../../services/properties.service";
 import { roomService } from "../../../../services/room.service";
@@ -42,7 +48,11 @@ const formatPriceVn = (price) =>
   }).format(price || 0);
 
 const normalizeText = (value = "") =>
-  value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 
 const getSafeNumber = (value, fallback) => {
   const parsedValue = Number(value);
@@ -65,7 +75,9 @@ const parseLocalDateParam = (value) => {
 const getAvailableRoomQuantity = (room, bookings) => {
   const bookedRooms = bookings.reduce((total, booking) => {
     const bookingRoomId =
-      typeof booking.room_id === "object" ? booking.room_id?._id : booking.room_id;
+      typeof booking.room_id === "object"
+        ? booking.room_id?._id
+        : booking.room_id;
     const normalizedBookingRoomId = String(bookingRoomId || "");
     const normalizedRoomId = String(room._id || "");
 
@@ -105,7 +117,9 @@ const getOwnerDisplay = (property) => {
   if (!property?.user_id) return "Chưa cập nhật";
 
   if (typeof property.user_id === "object") {
-    return property.user_id.full_name || property.user_id.email || "Chưa cập nhật";
+    return (
+      property.user_id.full_name || property.user_id.email || "Chưa cập nhật"
+    );
   }
 
   return "Chưa cập nhật";
@@ -135,25 +149,35 @@ const CityProperties = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const [properties, setProperties] = useState([]);
+  const [pagination, setPagination] = useState(null);
+  const [page, setPage] = useState(1);
+  const limit = 10;
   const [rooms, setRooms] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   const cityKey = city === "tp-hochiminh" ? "ho-chi-minh" : city;
   const cityInfo = cityMeta[cityKey] || {
     title: cityKey,
     subtitle: "Danh sách khách sạn phù hợp với tìm kiếm của bạn.",
   };
-
   useEffect(() => {
+    setPage(1);
+  }, [cityKey]);
+  useEffect(() => {
+    setLoading(true);
+
     Promise.all([
-      proPertiesService.getCity(cityKey),
+      proPertiesService.getCity(cityKey, page, limit),
       roomService.getAll(),
       BookingService.getAll(),
     ])
       .then(([propertiesRes, roomsRes, bookingRes]) => {
-        setProperties(propertiesRes.data.metaData || []);
+        setProperties(propertiesRes.data.metaData.properties || []);
+        setPagination(propertiesRes.data.metaData.pagination || null);
+
         setRooms(roomsRes.data.metaData || []);
+
         setBookings(
           (bookingRes?.data?.metaData || []).filter(
             (booking) => booking.status === "confirmed",
@@ -166,7 +190,7 @@ const CityProperties = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [cityKey]);
+  }, [cityKey, page, limit]);
 
   const searchKeyword = searchParams.get("q") || cityInfo.title;
   const displayDestination = getDisplayDestination(
@@ -193,10 +217,7 @@ const CityProperties = () => {
         });
 
         const availableRooms = propertyRooms.filter((room) => {
-          const availableQuantity = getAvailableRoomQuantity(
-            room,
-            bookings,
-          );
+          const availableQuantity = getAvailableRoomQuantity(room, bookings);
 
           return (
             availableQuantity >= roomsCount &&
@@ -230,7 +251,7 @@ const CityProperties = () => {
           keywordMatch,
         };
       })
-      .filter((item) => item.keywordMatch && item.availableRooms.length > 0)
+      .filter((item) => item.keywordMatch)
       .sort((a, b) => {
         if (a.is_preferred === b.is_preferred) {
           return a.minRoomPrice - b.minRoomPrice;
@@ -252,13 +273,13 @@ const CityProperties = () => {
 
   return (
     <div className="min-h-screen bg-[#f3f6fb] text-[#1a1a1a]">
-      <div className="bg-[linear-gradient(135deg,var(--color-primary)_0%,var(--color-primary-2)_100%)] px-4 pb-12 pt-10 md:px-8">
-        <div className="mx-auto max-w-7xl">
+      <div className="bg-[linear-gradient(135deg,var(--color-primary)_0%,var(--color-primary-2)_100%)] pb-10 pt-8 md:pb-12 md:pt-10">
+        <div className="container-custom">
           <div className="max-w-3xl">
             <span className="inline-flex rounded-full bg-white/20 px-4 py-1 text-sm font-semibold text-white backdrop-blur-sm">
               Thành phố đang tìm kiếm
             </span>
-            <h1 className="mt-4 text-4xl font-bold text-white md:text-5xl">
+            <h1 className="mt-4 text-[32px] font-bold leading-tight text-white sm:text-4xl md:text-5xl">
               Khách sạn tại {cityInfo.title}
             </h1>
             <p className="mt-3 max-w-2xl text-[17px] leading-7 text-white/90">
@@ -266,7 +287,7 @@ const CityProperties = () => {
             </p>
           </div>
 
-          <div className="mt-8 grid gap-4 rounded-[28px] bg-white/92 p-5 shadow-[0_20px_80px_rgba(12,39,88,0.18)] backdrop-blur md:grid-cols-4">
+          <div className="mt-8 grid gap-3 rounded-[22px] bg-white/92 p-4 shadow-[0_20px_80px_rgba(12,39,88,0.18)] backdrop-blur sm:rounded-[28px] sm:p-5 md:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-2xl bg-[#f6f9ff] p-4">
               <span className="block text-sm text-[#6b7280]">Điểm đến</span>
               <span className="mt-2 block text-lg font-semibold">
@@ -276,11 +297,14 @@ const CityProperties = () => {
             <div className="rounded-2xl bg-[#f6f9ff] p-4">
               <span className="block text-sm text-[#6b7280]">Lịch lưu trú</span>
               <span className="mt-2 block text-lg font-semibold">
-                {format(checkIn, "dd/MM/yyyy")} - {format(checkOut, "dd/MM/yyyy")}
+                {format(checkIn, "dd/MM/yyyy")} -{" "}
+                {format(checkOut, "dd/MM/yyyy")}
               </span>
             </div>
             <div className="rounded-2xl bg-[#f6f9ff] p-4">
-              <span className="block text-sm text-[#6b7280]">Khách và phòng</span>
+              <span className="block text-sm text-[#6b7280]">
+                Khách và phòng
+              </span>
               <span className="mt-2 block text-lg font-semibold">
                 {guests} khách - {roomsCount} phòng
               </span>
@@ -288,7 +312,7 @@ const CityProperties = () => {
             <div className="rounded-2xl bg-primary p-4 text-white">
               <span className="block text-sm text-white/80">Kết quả</span>
               <span className="mt-2 block text-lg font-semibold">
-                {propertyCards.length} khách sạn
+                {propertyCards.length} / {pagination?.total || 0} khách sạn
               </span>
               <span className="mt-1 block text-sm text-white/80">
                 {nightCount} đêm được áp dụng để tìm phòng
@@ -297,158 +321,248 @@ const CityProperties = () => {
           </div>
         </div>
       </div>
-
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 md:px-8 lg:grid-cols-[300px_1fr]">
-        <aside className="h-fit rounded-[28px] border border-[#dce7f6] bg-white p-6 shadow-[0_8px_30px_rgba(15,56,110,0.06)] lg:sticky lg:top-6">
-          <span className="text-2xl font-semibold">Tóm tắt tìm kiếm</span>
-          <Link
-            to={path.homePage}
-            className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#dbe7ff] bg-[#f8fbff] px-4 py-2 text-sm font-semibold text-primary transition hover:border-[#bfd3f6] hover:bg-[#eef5ff]"
+      <div className="container-custom">
+        <div className="pt-3">
+          <button
+            type="button"
+            onClick={() => navigate(path.homePage)}
+            className="mb-5  inline-flex items-center gap-2 rounded-full border border-[#dbe7ff] bg-white px-5 py-3 text-sm font-semibold text-[#003b95] shadow-sm transition-all duration-300 hover:-translate-x-1 hover:bg-[#f3f8ff] hover:shadow-md"
           >
-            <span className="text-base leading-none">←</span>
-            <span>Quay về trang chủ</span>
-          </Link>
+            <span className="text-lg leading-none">←</span>
+            <span>Quay về</span>
+          </button>
+        </div>
+        <div className="grid gap-6 pb-4 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
+          <aside className="h-fit rounded-[22px] border border-[#dce7f6] bg-white p-5 shadow-[0_8px_30px_rgba(15,56,110,0.06)] sm:rounded-[28px] sm:p-6 lg:sticky lg:top-6">
+            <span className="text-2xl font-semibold">Tóm tắt tìm kiếm</span>
+            <div className="mt-5 space-y-4">
+              <div className="rounded-2xl bg-[#f8fbff] p-4">
+                <span className="block text-sm text-[#64748b]">Thành phố</span>
+                <span className="mt-1 block font-semibold">
+                  {cityInfo.title}
+                </span>
+              </div>
 
-          <div className="mt-5 space-y-4">
-            <div className="rounded-2xl bg-[#f8fbff] p-4">
-              <span className="block text-sm text-[#64748b]">Thành phố</span>
-              <span className="mt-1 block font-semibold">{cityInfo.title}</span>
+              <div className="rounded-2xl bg-[#f8fbff] p-4">
+                <span className="block text-sm text-[#64748b]">Số đêm</span>
+                <span className="mt-1 block font-semibold">
+                  {nightCount} đêm
+                </span>
+              </div>
+
+              <div className="rounded-2xl bg-[#f8fbff] p-4">
+                <span className="block text-sm text-[#64748b]">
+                  Số lượng đặt
+                </span>
+                <span className="mt-1 block font-semibold">
+                  {guests} khách - {roomsCount} phòng
+                </span>
+              </div>
+
+              <div className="rounded-2xl bg-[rgba(0,108,228,0.08)] p-4">
+                <span className="block text-sm text-primary-2">
+                  Mẹo đặt phòng
+                </span>
+                <p className="mt-2 text-sm leading-6 text-[#334155]">
+                  Nên ưu tiên những khách sạn còn phòng, có giá theo đêm rõ ràng
+                  và số đêm tối đa phù hợp với lịch đi của bạn.
+                </p>
+              </div>
             </div>
+          </aside>
 
-            <div className="rounded-2xl bg-[#f8fbff] p-4">
-              <span className="block text-sm text-[#64748b]">Số đêm</span>
-              <span className="mt-1 block font-semibold">{nightCount} đêm</span>
-            </div>
+          <section className="flex flex-col gap-5">
+            {loading && (
+              <div className="col-span-full rounded-[28px] border border-[#dce7f6] bg-white p-10 text-center shadow-[0_8px_30px_rgba(15,56,110,0.06)]">
+                Đang tải danh sách khách sạn...
+              </div>
+            )}
 
-            <div className="rounded-2xl bg-[#f8fbff] p-4">
-              <span className="block text-sm text-[#64748b]">Số lượng đặt</span>
-              <span className="mt-1 block font-semibold">
-                {guests} khách - {roomsCount} phòng
-              </span>
-            </div>
+            {!loading && propertyCards.length === 0 && (
+              <div className="col-span-full rounded-[28px] border border-[#dce7f6] bg-white p-10 text-center shadow-[0_8px_30px_rgba(15,56,110,0.06)]">
+                <span className="block text-2xl font-semibold">
+                  Chưa tìm thấy khách sạn phù hợp
+                </span>
+                <p className="mt-3 text-[#64748b]">
+                  Thử đổi thành phố, giảm số khách hoặc số phòng để xem thêm kết
+                  quả.
+                </p>
+              </div>
+            )}
 
-            <div className="rounded-2xl bg-[rgba(0,108,228,0.08)] p-4">
-              <span className="block text-sm text-primary-2">Mẹo đặt phòng</span>
-              <p className="mt-2 text-sm leading-6 text-[#334155]">
-                Nên ưu tiên những khách sạn còn phòng, có giá theo đêm rõ ràng và
-                số đêm tối đa phù hợp với lịch đi của bạn.
-              </p>
-            </div>
-          </div>
-        </aside>
+            {!loading &&
+              propertyCards.map((item) => {
+                const detailUrl = `/properties/${item.city}/${item.slug}${location.search}`;
 
-        <section className="flex flex-col gap-5">
-          {loading && (
-            <div className="col-span-full rounded-[28px] border border-[#dce7f6] bg-white p-10 text-center shadow-[0_8px_30px_rgba(15,56,110,0.06)]">
-              Đang tải danh sách khách sạn...
-            </div>
-          )}
+                const visibleAmenities = Object.entries(item.amenities || {})
+                  .filter(([, value]) => value)
+                  .slice(0, 3);
 
-          {!loading && propertyCards.length === 0 && (
-            <div className="col-span-full rounded-[28px] border border-[#dce7f6] bg-white p-10 text-center shadow-[0_8px_30px_rgba(15,56,110,0.06)]">
-              <span className="block text-2xl font-semibold">
-                Chưa tìm thấy khách sạn phù hợp
-              </span>
-              <p className="mt-3 text-[#64748b]">
-                Thử đổi thành phố, giảm số khách hoặc số phòng để xem thêm kết quả.
-              </p>
-            </div>
-          )}
+                return (
+                  <article
+                    key={item._id}
+                    className="overflow-hidden rounded-[22px] border border-[#dce7f6] bg-white shadow-[0_10px_35px_rgba(0,59,149,0.08)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_20px_45px_rgba(0,59,149,0.14)] sm:rounded-[24px] xl:h-[320px]"
+                  >
+                    <div className="grid h-full grid-cols-1 md:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)_220px]">
+                      <Link
+                        to={detailUrl}
+                        className="relative block h-[210px] overflow-hidden bg-[#eef5ff] sm:h-[240px] md:h-full xl:h-[320px]"
+                      >
+                        <img
+                          src={item.main_image_url}
+                          alt={item.title}
+                          className="h-full w-full object-cover transition duration-500 hover:scale-105"
+                        />
 
-          {!loading &&
-            propertyCards.map((item) => (
-              <article
-                key={item._id}
-                className="overflow-hidden rounded-[24px] border border-[#dce7f6] bg-white shadow-[0_10px_35px_rgba(0,59,149,0.08)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_20px_45px_rgba(0,59,149,0.14)]"
-              >
-                <div className="flex flex-col md:flex-row">
-                  <div className="relative h-[220px] w-full shrink-0 overflow-hidden md:h-auto md:w-[300px]">
-                    <img
-                      src={item.main_image_url}
-                      alt={item.title}
-                      className="h-full w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
 
-                    <div className="absolute bottom-3 left-3 flex flex-wrap gap-2">
-                      {item.is_preferred && (
-                        <span className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-white">
-                          Ưu tiên
-                        </span>
-                      )}
+                        <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+                          {item.is_preferred && (
+                            <span className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-white shadow-[0_8px_18px_rgba(0,0,0,0.18)]">
+                              Được yêu thích
+                            </span>
+                          )}
 
-                      <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[#1a1a1a]">
-                        Tối đa {item.max_stay_days} đêm
-                      </span>
-                    </div>
-                  </div>
+                          <span className="rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-[#10357b]">
+                            Tối đa {item.max_stay_days || 30} đêm
+                          </span>
+                        </div>
+                      </Link>
 
-                  <div className="flex flex-1 flex-col p-4 md:p-5">
-                    <div className="flex flex-col gap-4 md:flex-row md:justify-between">
-                      <div className="min-w-0 flex-1">
+                      <div className="flex min-w-0 flex-col border-b border-[#e8eef8] p-5 md:min-h-[300px] md:border-b-0 xl:h-[320px] xl:border-r">
                         <Link
-                          to={`/properties/${item.city}/${item.slug}${location.search}`}
-                          className="line-clamp-2 text-[24px] font-bold leading-tight text-primary transition hover:text-primary-2"
+                          to={detailUrl}
+                          className="line-clamp-2 min-h-[56px] text-[22px] font-bold leading-tight text-primary transition hover:text-primary-2"
                         >
                           {item.title}
                         </Link>
 
-                        <span className="mt-2 block line-clamp-1 text-sm text-[#64748b]">
-                          {item.address}, {item.country}
-                        </span>
+                        <div className="mt-2 flex items-start gap-2 text-sm text-[#64748b]">
+                          <span className="mt-[1px] text-[#006ce4]">📍</span>
+                          <span className="line-clamp-1">
+                            {item.address}, {cityInfo.title}, {item.country}
+                          </span>
+                        </div>
 
-                        <span className="mt-3 inline-flex w-fit rounded-full bg-[#eef5ff] px-3 py-1 text-xs font-semibold text-[#0b4ecb]">
-                          Chủ sở hữu: {getOwnerDisplay(item)}
-                        </span>
+                        <div className="mt-3 flex h-[28px] flex-wrap items-center gap-2 overflow-hidden">
+                          <span className="inline-flex rounded-full bg-[#eef5ff] px-3 py-1 text-xs font-semibold text-[#0b4ecb]">
+                            Chủ sở hữu: {getOwnerDisplay(item)}
+                          </span>
 
-                        <p className="mt-3 line-clamp-2 text-sm leading-6 text-[#334155]">
-                          {item.description}
+                          <span className="inline-flex rounded-full bg-[#f1f8f3] px-3 py-1 text-xs font-semibold text-[#008234]">
+                            {item.availableRooms.length > 0
+                              ? `${item.availableRooms.length} phòng phù hợp`
+                              : "Chưa có phòng phù hợp"}
+                          </span>
+                        </div>
+
+                        <p className="mt-3 line-clamp-2 min-h-[48px] text-sm leading-6 text-[#334155]">
+                          {item.description ||
+                            "Chỗ nghỉ này chưa cập nhật mô tả chi tiết."}
                         </p>
 
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          {Object.entries(item.amenities || {})
-                            .filter(([, value]) => value)
-                            .slice(0, 3)
-                            .map(([key]) => (
+                        <div className="mt-4 flex h-[30px] flex-wrap gap-2 overflow-hidden">
+                          {visibleAmenities.length > 0 ? (
+                            visibleAmenities.map(([key]) => (
                               <span
                                 key={key}
                                 className="rounded-full border border-[#dce7f6] bg-[#f8fbff] px-3 py-1 text-xs text-primary"
                               >
                                 {amenityLabels[key] || key.replaceAll("_", " ")}
                               </span>
-                            ))}
+                            ))
+                          ) : (
+                            <span className="text-sm text-[#94a3b8]">
+                              Chưa cập nhật tiện nghi
+                            </span>
+                          )}
                         </div>
                       </div>
 
-                      <div className="w-full shrink-0 rounded-[18px] bg-[#f8fbff] p-4 md:w-[220px]">
-                        <span className="block text-sm text-[#64748b]">Giá từ</span>
-                        <span className="mt-1 block text-[28px] font-bold text-primary">
-                          {formatPriceVn(item.minRoomPrice)}
-                        </span>
-                        <span className="mt-1 block text-sm text-[#64748b]">/ đêm</span>
-                        <span className="mt-3 block text-sm font-medium text-[#008234]">
-                          {item.availableRooms.length} phòng phù hợp
-                        </span>
+                      <div className="flex flex-col justify-between bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] p-5 md:col-span-2 xl:col-span-1 xl:h-[320px]">
+                        <div>
+                          <span className="block text-sm text-[#64748b]">
+                            Giá từ
+                          </span>
+
+                          <span className="mt-1 block text-[26px] font-bold leading-tight text-primary">
+                            {formatPriceVn(item.minRoomPrice)}
+                          </span>
+
+                          <span className="mt-1 block text-sm text-[#64748b]">
+                            / đêm
+                          </span>
+
+                          <div className="mt-4 rounded-2xl bg-white px-3 py-3 shadow-sm ring-1 ring-[#e6efff]">
+                            <span className="block text-xs font-semibold uppercase tracking-[0.08em] text-[#64748b]">
+                              Tổng dự kiến
+                            </span>
+
+                            <span className="mt-1 block text-[16px] font-bold text-[#10357b]">
+                              {formatPriceVn(
+                                item.minRoomPrice * nightCount * roomsCount,
+                              )}
+                            </span>
+                          </div>
+
+                          <p className="mt-4 line-clamp-2 text-sm leading-6 text-[#64748b]">
+                            Bao gồm {nightCount} đêm, {roomsCount} phòng.
+                          </p>
+                        </div>
+
+                        <Link
+                          to={detailUrl}
+                          className="flex h-12 w-full items-center justify-center rounded-2xl bg-primary-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(0,108,228,0.22)] transition hover:bg-primary"
+                        >
+                          Xem chi tiết
+                        </Link>
                       </div>
                     </div>
+                  </article>
+                );
+              })}
+            {!loading && pagination && pagination.totalPages > 1 && (
+              <div className="mt-4 flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  disabled={page === 1}
+                  onClick={() => setPage((prev) => prev - 1)}
+                  className="rounded-xl border border-[#dce7f6] bg-white px-4 py-2 text-sm font-semibold text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Trước
+                </button>
 
-                    <div className="mt-auto flex flex-col gap-3 border-t border-[#e8eef8] pt-4 md:flex-row md:items-center md:justify-between">
-                      <span className="text-sm text-[#64748b]">
-                        {guests} khách - {roomsCount} phòng - {nightCount} đêm
-                      </span>
+                {Array.from({ length: pagination.totalPages }, (_, index) => {
+                  const pageNumber = index + 1;
 
-                      <Link
-                        to={`/properties/${item.city}/${item.slug}${location.search}`}
-                        className="inline-flex items-center justify-center rounded-xl bg-primary-2 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary"
-                      >
-                        Xem chi tiết
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            ))}
-        </section>
+                  return (
+                    <button
+                      type="button"
+                      key={pageNumber}
+                      onClick={() => setPage(pageNumber)}
+                      className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
+                        page === pageNumber
+                          ? "border-primary bg-primary text-white"
+                          : "border-[#dce7f6] bg-white text-primary"
+                      }`}
+                    >
+                      {pageNumber}
+                    </button>
+                  );
+                })}
+
+                <button
+                  type="button"
+                  disabled={page === pagination.totalPages}
+                  onClick={() => setPage((prev) => prev + 1)}
+                  className="rounded-xl border border-[#dce7f6] bg-white px-4 py-2 text-sm font-semibold text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Sau
+                </button>
+              </div>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   );

@@ -30,7 +30,7 @@ const AiStayAssistant = () => {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="group fixed bottom-6 right-6 z-50 flex h-[58px] w-[58px] items-center justify-center rounded-full bg-[#006ce4] shadow-[0_10px_28px_rgba(0,108,228,0.35)] transition-all duration-300 hover:-translate-y-1 hover:bg-[#003b95] hover:shadow-[0_14px_34px_rgba(0,59,149,0.38)] active:scale-95"
+        className="group fixed bottom-4 right-4 z-50 flex h-[54px] w-[54px] items-center justify-center rounded-full bg-[#006ce4] shadow-[0_10px_28px_rgba(0,108,228,0.35)] transition-all duration-300 hover:-translate-y-1 hover:bg-[#003b95] hover:shadow-[0_14px_34px_rgba(0,59,149,0.38)] active:scale-95 sm:bottom-6 sm:right-6 sm:h-[58px] sm:w-[58px]"
       >
         <LuBotMessageSquare
           size={28}
@@ -42,7 +42,7 @@ const AiStayAssistant = () => {
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-6 z-50 w-[380px] overflow-hidden rounded-[24px] border border-[#dbe7ff] bg-white shadow-[0_22px_60px_rgba(0,0,0,0.18)]">
+        <div className="fixed bottom-20 right-4 z-50 w-[calc(100vw-32px)] max-w-[380px] overflow-hidden rounded-[22px] border border-[#dbe7ff] bg-white shadow-[0_22px_60px_rgba(0,0,0,0.18)] sm:bottom-24 sm:right-6 sm:rounded-[24px]">
           <div className="bg-[#003b95] px-5 py-4 text-white">
             <h3 className="text-[18px] font-bold">Trợ lý tìm chỗ nghỉ</h3>
             <p className="mt-1 text-sm text-white/80">
@@ -50,13 +50,13 @@ const AiStayAssistant = () => {
             </p>
           </div>
 
-          <div className="p-5">
+          <div className="p-4 sm:p-5">
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={4}
               placeholder="Ví dụ: Tôi muốn đi Đà Lạt 2 người, ở 2 đêm, giá dưới 1 triệu/đêm..."
-              className="w-full h-[140px] rounded-2xl border border-[#dbe7ff] px-4 py-3 text-sm outline-none focus:border-[#006ce4]"
+              className="h-[120px] w-full rounded-2xl border border-[#dbe7ff] px-4 py-3 text-sm outline-none focus:border-[#006ce4] sm:h-[140px]"
             />
 
             <button

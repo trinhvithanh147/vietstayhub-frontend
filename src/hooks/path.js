@@ -9,4 +9,5 @@ export const path = {
   hostDashboardPage: "/host-dashboard",
   forgotpassword: "/forgot-password",
   profile: "/profile",
+  message: "/message",
 };

@@ -11,6 +11,7 @@ import proPertiesService from "../../../../services/properties.service";
 import { reviewService } from "../../../../services/review.service";
 import { roomService } from "../../../../services/room.service";
 import { userService } from "../../../../services/users.service";
+import { conversationService } from "../../../../services/conversation.service";
 
 const moneyFormatter = new Intl.NumberFormat("vi-VN");
 const calculateCurrentPrice = (originalPrice, discountPercent) => {
@@ -433,6 +434,7 @@ const BookingRow = ({ item, actionSlot, personMode = "booker" }) => {
 const HostDashboardPage = () => {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const avatarRef = useRef(null);
+  const [messageCount, setMessageCount] = useState(0);
   const [avatar, setAvatar] = useState(false);
   const [booking, setBooking] = useState([]);
   const [myBooking, setMyBooking] = useState([]);
@@ -460,7 +462,24 @@ const HostDashboardPage = () => {
   const [propertyImageInputKey, setPropertyImageInputKey] = useState(0);
   const [collapsedRoomGroups, setCollapsedRoomGroups] = useState({});
   const [collapsedReviewGroups, setCollapsedReviewGroups] = useState({});
+  useEffect(() => {
+    const loadMessageCount = async () => {
+      try {
+        if (!user?._id) return;
 
+        const res = await conversationService.getMy();
+        const list = res.data.metaData || [];
+
+        const realConversations = list.filter((item) => item.last_message);
+
+        setMessageCount(realConversations.length);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    loadMessageCount();
+  }, [user?._id]);
   useEffect(() => {
     if (!user?._id) return;
 
@@ -900,20 +919,21 @@ const HostDashboardPage = () => {
   return (
     <>
       <div className="bg-primary pt-2 text-white">
-        <div className="container-custom w-full">
-          <div className="flex items-center justify-between pb-3 pt-1">
+        <div className="header container-custom">
+          <div className="header_top">
+            <div className="top flex flex-wrap items-center justify-between gap-3 pb-2 pt-1">
             <Link to={path.homePage}>
               <Icon.logoBrand className="h-[24px] w-[144px]" />
             </Link>
 
-            <div className="flex items-center justify-center gap-2">
-              <span className="cursor-pointer rounded-sm px-3 py-2 font-medium hover:bg-white/10">
+            <div className="flex max-w-full flex-wrap items-center justify-end gap-2">
+              <span className="hidden cursor-pointer px-3 py-2 font-medium hover:rounded-sm hover:bg-white/10 sm:inline-flex">
                 VND
               </span>
-              <span className="cursor-pointer rounded-sm px-3 py-2 hover:bg-white/10">
+              <span className="hidden cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10 sm:inline-flex">
                 <img src={flatVN} alt="" className="h-6 w-6 rounded-full" />
               </span>
-              <span className="cursor-pointer rounded-sm px-3 py-2 hover:bg-white/10">
+              <span className="hidden cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10 md:inline-flex">
                 <Icon.questionCircle className="w-5 fill-white" />
               </span>
 
@@ -921,11 +941,22 @@ const HostDashboardPage = () => {
                 <>
                   <Link
                     to={path.hostDashboardPage}
-                    className="rounded-sm px-3 py-2 text-[16px] font-medium hover:bg-white/10"
+                    className="hidden px-3 py-2 text-[15px] font-medium hover:rounded-sm hover:bg-white/10 md:inline-flex lg:text-[16px]"
                   >
                     Quản lý chỗ nghỉ
                   </Link>
-                  <div ref={avatarRef} className="relative h-10 w-10">
+                  <Link
+                    to={path.message}
+                    className="relative px-3 py-2 text-[15px] font-medium hover:rounded-sm hover:bg-white/10 lg:text-[16px]"
+                  >
+                    Tin nhắn
+                    {messageCount > 0 && (
+                      <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
+                        {messageCount}
+                      </span>
+                    )}
+                  </Link>
+                  <div ref={avatarRef} className="relative z-[100] h-10 w-10">
                     <button
                       type="button"
                       onClick={() => setAvatar(!avatar)}
@@ -940,7 +971,7 @@ const HostDashboardPage = () => {
                     {avatar && (
                       <div
                         onClick={(e) => e.stopPropagation()}
-                        className="absolute left-1/2 top-full z-20 mt-3 w-[260px] -translate-x-1/2 overflow-hidden rounded-[22px] border border-[#d9e2f1] bg-white text-[#1a1a1a] shadow-[0_22px_50px_rgba(0,0,0,0.18)]"
+                        className="absolute right-0 top-full z-[120] mt-3 w-[min(260px,calc(100vw-32px))] overflow-hidden rounded-[22px] border border-[#d9e2f1] bg-white text-[#1a1a1a] shadow-[0_22px_50px_rgba(0,0,0,0.18)] sm:left-1/2 sm:right-auto sm:-translate-x-1/2"
                       >
                         <div className="border-b border-[#eef3fb] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] p-4">
                           <div className="flex items-center gap-3">
@@ -962,7 +993,7 @@ const HostDashboardPage = () => {
                         <div className="space-y-2 p-3">
                           <Link
                             to={path.profile}
-                            className="block w-full rounded-xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3 text-sm font-semibold text-[#003b95] transition hover:border-[#bfd3f6] hover:bg-[#eef5ff]"
+                            className="flex w-full items-center justify-between rounded-xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3 text-sm font-semibold text-[#003b95] transition hover:border-[#bfd3f6] hover:bg-[#eef5ff]"
                           >
                             <div className="flex items-center justify-between">
                               <span>Hồ sơ cá nhân</span>
@@ -994,13 +1025,14 @@ const HostDashboardPage = () => {
                 </>
               )}
             </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-[linear-gradient(180deg,#edf4ff_0%,#ffffff_36%,#edf4ff_100%)] pb-16">
-        <div className="w-full px-4 py-8 text-[#1a1a1a] sm:px-6 xl:px-8 2xl:px-10">
-          <div className="mb-8 rounded-[30px] border border-[#dbe7ff] bg-white p-6 shadow-[0_18px_45px_rgba(0,59,149,0.08)] md:p-8">
+      <div className="bg-[linear-gradient(180deg,#edf4ff_0%,#ffffff_36%,#edf4ff_100%)] pb-12 sm:pb-16">
+        <div className="w-full px-4 py-6 text-[#1a1a1a] sm:px-6 sm:py-8 xl:px-8 2xl:px-10">
+          <div className="mb-6 rounded-[24px] border border-[#dbe7ff] bg-white p-4 shadow-[0_18px_45px_rgba(0,59,149,0.08)] sm:mb-8 sm:rounded-[30px] sm:p-6 md:p-8">
             <SectionHeader
               title="Đặt phòng của tôi"
               count={myBooking.length}
@@ -1033,20 +1065,20 @@ const HostDashboardPage = () => {
               ))}
           </div>
 
-          <div className="rounded-[36px] border border-[#d7e5ff] bg-[linear-gradient(135deg,#003b95_0%,#006ce4_100%)] p-8 text-white shadow-[0_24px_60px_rgba(0,59,149,0.22)]">
+          <div className="rounded-[26px] border border-[#d7e5ff] bg-[linear-gradient(135deg,#003b95_0%,#006ce4_100%)] p-5 text-white shadow-[0_24px_60px_rgba(0,59,149,0.22)] sm:rounded-[32px] sm:p-6 lg:rounded-[36px] lg:p-8">
             <div className="max-w-[860px]">
-              <span className="inline-flex rounded-full bg-white/15 px-4 py-2 text-[13px] font-semibold uppercase tracking-[0.24em] text-white/80">
+              <span className="inline-flex rounded-full bg-white/15 px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-white/80 sm:px-4 sm:text-[13px] sm:tracking-[0.24em]">
                 Host Dashboard
               </span>
-              <h1 className="mt-4 text-[34px] font-bold leading-tight md:text-[42px]">
+              <h1 className="mt-4 text-[28px] font-bold leading-tight sm:text-[34px] md:text-[42px]">
                 Quản lý chỗ nghỉ và đơn khách đặt
               </h1>
               <p className="mt-3 max-w-[720px] text-[16px] leading-7 text-white/82">
                 Theo dõi các đơn khách đặt vào chỗ nghỉ của bạn, quản lý phòng,
                 bình luận và thông tin chỗ nghỉ trong cùng một khu làm việc.
               </p>
-              <div className="mt-6 grid gap-4 md:grid-cols-4">
-                <div className="rounded-[24px] border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
+              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="rounded-[20px] border border-white/20 bg-white/10 p-4 backdrop-blur-sm sm:rounded-[24px]">
                   <span className="block text-[13px] text-white/75">
                     Đơn khách đặt
                   </span>
@@ -1054,7 +1086,7 @@ const HostDashboardPage = () => {
                     {ownerBooking.length}
                   </span>
                 </div>
-                <div className="rounded-[24px] border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
+                <div className="rounded-[20px] border border-white/20 bg-white/10 p-4 backdrop-blur-sm sm:rounded-[24px]">
                   <span className="block text-[13px] text-white/75">
                     Chỗ nghỉ
                   </span>
@@ -1062,13 +1094,13 @@ const HostDashboardPage = () => {
                     {properties.length}
                   </span>
                 </div>
-                <div className="rounded-[24px] border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
+                <div className="rounded-[20px] border border-white/20 bg-white/10 p-4 backdrop-blur-sm sm:rounded-[24px]">
                   <span className="block text-[13px] text-white/75">Phòng</span>
                   <span className="mt-2 block text-[28px] font-bold">
                     {rooms.length}
                   </span>
                 </div>
-                <div className="rounded-[24px] border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
+                <div className="rounded-[20px] border border-white/20 bg-white/10 p-4 backdrop-blur-sm sm:rounded-[24px]">
                   <span className="block text-[13px] text-white/75">
                     Bình luận
                   </span>
@@ -1080,8 +1112,8 @@ const HostDashboardPage = () => {
             </div>
           </div>
 
-          <div className="mt-8 grid gap-8">
-            <div className="rounded-[30px] border border-[#dbe7ff] bg-white p-6 shadow-[0_18px_45px_rgba(0,59,149,0.08)] md:p-8">
+          <div className="mt-6 grid gap-6 sm:mt-8 sm:gap-8">
+            <div className="rounded-[24px] border border-[#dbe7ff] bg-white p-4 shadow-[0_18px_45px_rgba(0,59,149,0.08)] sm:rounded-[30px] sm:p-6 md:p-8">
               <SectionHeader
                 title="Đơn khách đặt phòng"
                 count={ownerBooking.length}
@@ -1162,16 +1194,16 @@ const HostDashboardPage = () => {
         </div>
       </div>
 
-      <div className="w-full px-4 pb-16 sm:px-6 xl:px-8 2xl:px-10">
-        <div className="grid gap-8 xl:grid-cols-1 2xl:grid-cols-[1.15fr_0.95fr]">
+      <div className="w-full px-4 pb-12 sm:px-6 sm:pb-16 xl:px-8 2xl:px-10">
+        <div className="grid gap-6 sm:gap-8 xl:grid-cols-1 2xl:grid-cols-[1.15fr_0.95fr]">
           <div className="space-y-6">
-            <div className="rounded-[30px] border border-[#dbe7ff] bg-white p-6 shadow-[0_18px_45px_rgba(0,59,149,0.08)] md:p-8">
+            <div className="rounded-[24px] border border-[#dbe7ff] bg-white p-4 shadow-[0_18px_45px_rgba(0,59,149,0.08)] sm:rounded-[30px] sm:p-6 md:p-8">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <span className="inline-flex rounded-full bg-[#eef4ff] px-4 py-2 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#003b95]">
+                  <span className="inline-flex rounded-full bg-[#eef4ff] px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#003b95] sm:px-4 sm:text-[13px] sm:tracking-[0.16em]">
                     Property CRUD
                   </span>
-                  <h2 className="mt-4 text-[28px] font-bold text-[#10357b]">
+                  <h2 className="mt-4 text-[24px] font-bold leading-tight text-[#10357b] sm:text-[28px]">
                     Quản lý chỗ nghỉ
                   </h2>
                   <p className="mt-2 text-[15px] leading-7 text-[#5b6b88]">
@@ -1179,7 +1211,7 @@ const HostDashboardPage = () => {
                     đây.
                   </p>
                 </div>
-                <div className="flex gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:w-auto">
                   <button
                     onClick={() => setShowPropertyForm((prev) => !prev)}
                     className="rounded-xl bg-primary-2 px-5 py-3 text-[14px] font-semibold text-white transition hover:brightness-110"

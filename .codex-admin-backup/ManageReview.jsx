@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { reviewService } from "../../../services/review.service";
 import { userService } from "../../../services/users.service";
 import proPertiesService from "../../../services/properties.service";
@@ -55,9 +55,9 @@ const ManageReview = () => {
 
       const propertyTitle =
         typeof rawProperty === "object"
-          ? rawProperty?.title || "Chỗ nghỉ chưa xác định"
+          ? rawProperty?.title || "Ch? ngh? chua x�c d?nh"
           : properties.find((property) => property._id === rawProperty)
-              ?.title || "Chỗ nghỉ chưa xác định";
+              ?.title || "Ch? ngh? chua x�c d?nh";
 
       const propertyCity =
         typeof rawProperty === "object"
@@ -87,7 +87,7 @@ const ManageReview = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa đánh giá này không?")) return;
+    if (!window.confirm("B?n c� ch?c mu?n x�a d�nh gi� n�y kh�ng?")) return;
     try {
       await reviewService.delete(id);
       await load();
@@ -129,7 +129,7 @@ const ManageReview = () => {
       setItems(res.data.metaData || []);
     } catch (err) {
       console.log(err);
-      alert(err?.response?.data?.message || "Ẩn/hiện bình luận thất bại");
+      alert(err?.response?.data?.message || "?n/hi?n b�nh lu?n th?t b?i");
     }
   };
   const handleSubmit = async () => {
@@ -160,15 +160,15 @@ const ManageReview = () => {
     <div className="rounded-[22px] border border-[#dbe7ff] bg-white p-4 shadow-[0_18px_55px_rgba(0,59,149,0.08)] sm:rounded-[28px] sm:p-6 md:p-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="text-[22px] font-bold text-[#0b2f6a]">Đánh giá</h2>
+          <h2 className="text-[22px] font-bold text-[#0b2f6a]">��nh gi�</h2>
           <p className="mt-1 text-sm text-[#5b6b86]">
-            Danh sách đánh giá và bình luận trong hệ thống.
+            Danh s�ch d�nh gi� v� b�nh lu?n trong h? th?ng.
           </p>
         </div>
 
-        <div className="grid w-full grid-cols-2 gap-2 sm:w-auto">
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
           <div className="rounded-2xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3">
-            <div className="text-xs font-semibold text-[#6a7da5]">Tổng</div>
+            <div className="text-xs font-semibold text-[#6a7da5]">T?ng</div>
             <div className="text-xl font-bold text-[#0b2f6a]">
               {items.length}
             </div>
@@ -178,36 +178,36 @@ const ManageReview = () => {
             onClick={load}
             className="h-11 rounded-2xl border border-[#dbe7ff] bg-white px-4 text-sm font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
           >
-            Tải lại
+            T?i l?i
           </button>
         </div>
       </div>
 
-      <div className="mt-6 rounded-[20px] border border-[#edf3ff] bg-[#f8fbff] p-4 sm:rounded-[24px] sm:p-5">
+      <div className="mt-5 rounded-[20px] border border-[#edf3ff] bg-[#f8fbff] p-4 sm:mt-6 sm:rounded-[24px] sm:p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <h3 className="text-lg font-bold text-[#0b2f6a]">
-              {editingId ? "Cập nhật đánh giá" : "Tạo đánh giá mới"}
+              {editingId ? "C?p nh?t d�nh gi�" : "T?o d�nh gi� m?i"}
             </h3>
             <p className="mt-1 text-sm text-[#5b6b86]">
-              Quản trị viên có thể tạo đánh giá mẫu, cập nhật số sao và nội dung
-              bình luận.
+              Qu?n tr? vi�n c� th? t?o d�nh gi� m?u, c?p nh?t s? sao v� n?i dung
+              b�nh lu?n.
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="grid w-full grid-cols-1 gap-2 sm:w-auto sm:grid-cols-2">
             <button
               type="button"
               onClick={handleSubmit}
               className="h-11 rounded-2xl bg-[#006ce4] px-4 text-sm font-semibold text-white hover:bg-[#003b95]"
             >
-              {editingId ? "Cập nhật đánh giá" : "Tạo đánh giá"}
+              {editingId ? "C?p nh?t d�nh gi�" : "T?o d�nh gi�"}
             </button>
             <button
               type="button"
               onClick={handleReset}
               className="h-11 rounded-2xl border border-[#dbe7ff] bg-white px-4 text-sm font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
             >
-              Làm mới
+              L�m m?i
             </button>
           </div>
         </div>
@@ -219,7 +219,7 @@ const ManageReview = () => {
             onChange={handleChange}
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           >
-            <option value="">Chọn người dùng</option>
+            <option value="">Ch?n ngu?i d�ng</option>
             {users.map((user) => (
               <option key={user._id} value={user._id}>
                 {user.full_name} - {user.email}
@@ -233,7 +233,7 @@ const ManageReview = () => {
             onChange={handleChange}
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           >
-            <option value="">Chọn chỗ nghỉ</option>
+            <option value="">Ch?n ch? ngh?</option>
             {properties.map((property) => (
               <option key={property._id} value={property._id}>
                 {property.title}
@@ -259,7 +259,7 @@ const ManageReview = () => {
           name="comment"
           value={form.comment}
           onChange={handleChange}
-          placeholder="Nhập nội dung bình luận"
+          placeholder="Nh?p n?i dung b�nh lu?n"
           className="mt-4 min-h-[120px] w-full rounded-2xl border border-[#dbe7ff] bg-white px-4 py-3 outline-none focus:border-[#006ce4]"
         />
       </div>
@@ -267,26 +267,26 @@ const ManageReview = () => {
       <div className="mt-6 overflow-hidden rounded-2xl border border-[#edf3ff]">
         <div className="flex flex-col gap-3 bg-[#f8fbff] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-sm font-semibold text-[#0b2f6a]">
-            Danh sách đánh giá
+            Danh s�ch d�nh gi�
           </span>
           <button
             type="button"
             onClick={() => setShowReviewList((prev) => !prev)}
             className="rounded-xl border border-[#dbe7ff] bg-white px-4 py-2 text-xs font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
           >
-            {showReviewList ? "Thu gọn danh sách" : "Mở danh sách"}
+            {showReviewList ? "Thu g?n danh s�ch" : "M? danh s�ch"}
           </button>
         </div>
 
         {!showReviewList ? (
           <div className="px-4 py-8 text-sm text-[#5b6b86]">
-            Danh sách đánh giá đang được thu gọn.
+            Danh s�ch d�nh gi� dang du?c thu g?n.
           </div>
         ) : loading ? (
-          <div className="px-4 py-8 text-sm text-[#5b6b86]">Đang tải...</div>
+          <div className="px-4 py-8 text-sm text-[#5b6b86]">�ang t?i...</div>
         ) : items.length === 0 ? (
           <div className="px-4 py-8 text-sm text-[#5b6b86]">
-            Không có đánh giá.
+            Kh�ng c� d�nh gi�.
           </div>
         ) : (
           <div className="space-y-4 px-4 py-4">
@@ -307,8 +307,8 @@ const ManageReview = () => {
                       </div>
                       <div className="mt-1 text-xs text-[#6a7da5]">
                         {group.propertyCity || ""}
-                        {group.propertyCity ? " • " : ""}
-                        {group.reviews.length} đánh giá
+                        {group.propertyCity ? " � " : ""}
+                        {group.reviews.length} d�nh gi�
                       </div>
                     </div>
                     <button
@@ -316,13 +316,13 @@ const ManageReview = () => {
                       onClick={() => toggleReviewGroup(group.propertyId)}
                       className="rounded-xl border border-[#dbe7ff] bg-white px-4 py-2 text-xs font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
                     >
-                      {isCollapsed ? "Mở đánh giá" : "Thu gọn đánh giá"}
+                      {isCollapsed ? "M? d�nh gi�" : "Thu g?n d�nh gi�"}
                     </button>
                   </div>
 
                   {isCollapsed ? (
                     <div className="px-4 py-6 text-sm text-[#5b6b86]">
-                      Nhóm đánh giá này đang được thu gọn.
+                      Nh�m d�nh gi� n�y dang du?c thu g?n.
                     </div>
                   ) : (
                     <>
@@ -330,50 +330,39 @@ const ManageReview = () => {
                         {group.reviews.map((r) => (
                           <div
                             key={r._id}
-                            className="rounded-2xl border border-[#edf3ff] bg-white p-4 text-sm text-[#0b2f6a]"
+                            className="rounded-2xl border border-[#dbe7ff] bg-white p-4 text-sm text-[#0b2f6a]"
                           >
-                            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                              <div className="min-w-0">
-                                <div className="font-semibold">
-                                  {r.property_id?.title || group.propertyTitle}
-                                </div>
-                                <div className="mt-1 text-xs text-[#6a7da5]">
-                                  {r.property_id?.city ||
-                                    group.propertyCity ||
-                                    ""}
-                                </div>
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                <span className="inline-flex rounded-full border border-[#dbe7ff] bg-[#f6faff] px-3 py-1 text-xs font-semibold text-[#0b2f6a]">
-                                  {r.rating ?? "-"} sao
-                                </span>
-                                <span
-                                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                                    r.is_visible === false
-                                      ? "bg-[#fff3f2] text-[#b42318]"
-                                      : "bg-[#e8f7ef] text-[#0f6b3f]"
-                                  }`}
-                                >
-                                  {r.is_visible === false
-                                    ? "Đang ẩn"
-                                    : "Đang hiện"}
-                                </span>
-                              </div>
+                            <div className="font-semibold">
+                              {r.property_id?.title || group.propertyTitle}
                             </div>
-
-                            <div className="mt-4 text-xs text-[#5b6b86]">
+                            <div className="mt-1 text-xs text-[#6a7da5]">
+                              {r.property_id?.city || group.propertyCity || ""}
+                            </div>
+                            <div className="mt-3 rounded-2xl bg-[#f8fbff] p-3 text-xs text-[#5b6b86]">
                               <div className="font-semibold text-[#0b2f6a]">
-                                {r.user_id?.full_name || "Người dùng"}
+                                {r.user_id?.full_name || "Ngu?i d�ng"}
                               </div>
                               <div className="mt-1 break-words">
                                 {r.user_id?.email || ""}
                               </div>
                             </div>
-
-                            <div className="mt-4 rounded-xl bg-[#f8fbff] p-3 text-sm text-[#5b6b86]">
+                            <div className="mt-3 flex flex-wrap items-center gap-2">
+                              <span className="inline-flex rounded-full border border-[#dbe7ff] bg-[#f6faff] px-3 py-1 text-xs font-semibold text-[#0b2f6a]">
+                                {r.rating ?? "-"} sao
+                              </span>
+                              <span
+                                className={`rounded-lg px-3 py-1 text-xs font-semibold ${
+                                  r.is_visible === false
+                                    ? "bg-[#fff3f2] text-[#b42318]"
+                                    : "bg-[#e8f7ef] text-[#0f6b3f]"
+                                }`}
+                              >
+                                {r.is_visible === false ? "�ang ?n" : "�ang hi?n"}
+                              </span>
+                            </div>
+                            <div className="mt-3 rounded-2xl border border-[#edf3ff] bg-white px-3 py-3 text-[#5b6b86]">
                               {r.comment || "-"}
                             </div>
-
                             <div className="mt-4 grid grid-cols-3 gap-2">
                               <button
                                 type="button"
@@ -383,27 +372,27 @@ const ManageReview = () => {
                                     r.is_visible === false,
                                   )
                                 }
-                                className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                                className={`h-10 rounded-xl px-3 text-xs font-semibold transition ${
                                   r.is_visible === false
                                     ? "bg-[#006ce4] text-white hover:bg-[#003b95]"
                                     : "border border-[#f0c6c2] bg-white text-[#b42318] hover:bg-[#fff3f2]"
                                 }`}
                               >
-                                {r.is_visible === false ? "Hiện" : "Ẩn"}
+                                {r.is_visible === false ? "Hi?n" : "?n"}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleEdit(r)}
-                                className="rounded-lg bg-[#006ce4] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#003b95]"
+                                className="h-10 rounded-xl bg-[#006ce4] px-3 text-xs font-semibold text-white transition hover:bg-[#003b95]"
                               >
-                                Sửa
+                                S?a
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleDelete(r._id)}
-                                className="rounded-lg border border-[#f0c6c2] bg-white px-3 py-2 text-xs font-semibold text-[#b42318] transition hover:bg-[#fff3f2]"
+                                className="h-10 rounded-xl border border-[#f0c6c2] bg-white px-3 text-xs font-semibold text-[#b42318] transition hover:bg-[#fff3f2]"
                               >
-                                Xóa
+                                X�a
                               </button>
                             </div>
                           </div>
@@ -412,20 +401,20 @@ const ManageReview = () => {
 
                       <div className="hidden overflow-x-auto lg:block">
                         <div className="min-w-[920px]">
-                          <div className="grid grid-cols-[1.1fr_0.8fr_0.5fr_1.2fr_0.6fr] gap-3 bg-[#f8fbff] px-4 py-3 text-xs font-semibold tracking-[0.06em] text-[#6a7da5]">
-                            <div>Chỗ nghỉ</div>
-                            <div>Người dùng</div>
-                            <div>Số sao</div>
-                            <div>Bình luận</div>
-                            <div>Thao tác</div>
-                          </div>
+                      <div className="grid grid-cols-[1.1fr_0.8fr_0.5fr_1.2fr_0.6fr] gap-3 bg-[#f8fbff] px-4 py-3 text-xs font-semibold tracking-[0.06em] text-[#6a7da5]">
+                        <div>Ch? ngh?</div>
+                        <div>Ngu?i d�ng</div>
+                        <div>S? sao</div>
+                        <div>B�nh lu?n</div>
+                        <div>Thao t�c</div>
+                      </div>
 
-                          <div className="divide-y divide-[#edf3ff]">
-                            {group.reviews.map((r) => (
-                              <div
-                                key={r._id}
-                                className="grid grid-cols-[1.1fr_0.8fr_0.5fr_1.2fr_0.6fr] gap-3 px-4 py-4 text-sm text-[#0b2f6a]"
-                              >
+                      <div className="divide-y divide-[#edf3ff]">
+                        {group.reviews.map((r) => (
+                          <div
+                            key={r._id}
+                            className="grid grid-cols-[1.1fr_0.8fr_0.5fr_1.2fr_0.6fr] gap-3 px-4 py-4 text-sm text-[#0b2f6a]"
+                          >
                             <div className="min-w-0">
                               <div className="truncate font-semibold">
                                 {r.property_id?.title || group.propertyTitle}
@@ -439,7 +428,7 @@ const ManageReview = () => {
 
                             <div className="min-w-0">
                               <div className="truncate font-semibold">
-                                {r.user_id?.full_name || "Người dùng"}
+                                {r.user_id?.full_name || "Ngu?i d�ng"}
                               </div>
                               <div className="truncate text-xs text-[#6a7da5]">
                                 {r.user_id?.email || ""}
@@ -465,8 +454,8 @@ const ManageReview = () => {
                                 }`}
                               >
                                 {r.is_visible === false
-                                  ? "Đang ẩn"
-                                  : "Đang hiện"}
+                                  ? "�ang ?n"
+                                  : "�ang hi?n"}
                               </span>
 
                               <div className="flex flex-wrap gap-2">
@@ -484,7 +473,7 @@ const ManageReview = () => {
                                       : "border border-[#f0c6c2] bg-white text-[#b42318] hover:bg-[#fff3f2]"
                                   }`}
                                 >
-                                  {r.is_visible === false ? "Hiện" : "Ẩn"}
+                                  {r.is_visible === false ? "Hi?n" : "?n"}
                                 </button>
 
                                 <button
@@ -492,7 +481,7 @@ const ManageReview = () => {
                                   onClick={() => handleEdit(r)}
                                   className="rounded-lg bg-[#006ce4] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#003b95]"
                                 >
-                                  Sửa
+                                  S?a
                                 </button>
 
                                 <button
@@ -500,13 +489,13 @@ const ManageReview = () => {
                                   onClick={() => handleDelete(r._id)}
                                   className="rounded-lg border border-[#f0c6c2] bg-white px-3 py-2 text-xs font-semibold text-[#b42318] transition hover:bg-[#fff3f2]"
                                 >
-                                  Xóa
+                                  X�a
                                 </button>
                               </div>
                             </div>
                           </div>
-                            ))}
-                          </div>
+                        ))}
+                      </div>
                         </div>
                       </div>
                     </>

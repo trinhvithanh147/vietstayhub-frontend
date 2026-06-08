@@ -74,7 +74,7 @@ const AdminTemplate = () => {
   return (
     <div className="min-h-screen bg-[#f5f8ff]">
       <div className="bg-primary text-white">
-        <div className="container-custom flex items-center justify-between py-3">
+        <div className="container-custom flex flex-wrap items-center justify-between gap-3 py-3">
           <div className="flex items-center gap-3">
             <Link to={path.homePage} className="inline-flex items-center gap-2">
               <Icon.logoBrand className="h-[22px] w-[132px]" />
@@ -88,9 +88,9 @@ const AdminTemplate = () => {
             <button
               type="button"
               onClick={() => setOpenMenu((v) => !v)}
-              className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 transition hover:bg-white/15"
+              className="flex items-center gap-2 rounded-full bg-white/10 px-2 py-2 transition hover:bg-white/15 sm:px-3"
             >
-              <span className="text-sm font-semibold">
+              <span className="hidden max-w-[140px] truncate text-sm font-semibold sm:block">
                 {user?.full_name || "Admin"}
               </span>
 
@@ -106,7 +106,7 @@ const AdminTemplate = () => {
             {openMenu && (
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="absolute right-0 top-[56px] z-[120] w-[280px] overflow-hidden rounded-[22px] border border-[#d9e2f1] bg-white text-[#1a1a1a] shadow-[0_22px_50px_rgba(0,0,0,0.18)]"
+                className="absolute right-0 top-[56px] z-[120] w-[min(280px,calc(100vw-32px))] overflow-hidden rounded-[22px] border border-[#d9e2f1] bg-white text-[#1a1a1a] shadow-[0_22px_50px_rgba(0,0,0,0.18)]"
               >
                 <div className="border-b border-[#eef3fb] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] p-4">
                   <div className="flex items-center gap-3">
@@ -149,7 +149,7 @@ const AdminTemplate = () => {
         </div>
       </div>
 
-      <main className="container-custom py-8">
+      <main className="container-custom py-5 sm:py-8">
         <Outlet />
       </main>
     </div>

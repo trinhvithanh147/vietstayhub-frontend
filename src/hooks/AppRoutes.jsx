@@ -15,6 +15,7 @@ import AdminTemplate from "../templates/AdminTemplate/AdminTemplate";
 import AdminPage from "../pages/AdminPage/AdminPage";
 
 import HostDashboardPage from "../pages/HomePage/components/HostDashboardPage/HostDashboardPage";
+import MessagePage from "../pages/HomePage/components/MessagePage/MessagePage";
 
 const AppRoutes = () => {
   return (
@@ -35,6 +36,7 @@ const AppRoutes = () => {
       <Route path={path.profile} element={<UserProfile />} />
       <Route path={path.loginSuccess} element={<LoginSuccess />} />
       <Route path={path.item} element={<PropertyCard />} />
+      <Route path={path.message} element={<MessagePage />} />
     </Routes>
   );
 };

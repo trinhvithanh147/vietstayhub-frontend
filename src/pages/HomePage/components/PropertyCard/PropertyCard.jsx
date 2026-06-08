@@ -1,6 +1,6 @@
-﻿import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { differenceInCalendarDays, format } from "date-fns";
-import { useLocation, useParams, Link } from "react-router-dom";
+import { useLocation, useParams, Link, useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import {
@@ -38,7 +38,9 @@ import { roomService } from "../../../../services/room.service";
 import { BookingService } from "../../../../services/booking.service";
 import { userService } from "../../../../services/users.service";
 import Footer from "../../../../templates/HomeTemplate/Footer/Footer";
-
+import { conversationService } from "../../../../services/conversation.service";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 const getToday = () => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -89,13 +91,15 @@ const getStoredUser = () => {
 const PropertyCard = () => {
   // State goc cua trang chi tiet: property, review, room.
   const [properties, setProperties] = useState({});
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   const [review, setReview] = useState([]);
   const [room, setRoom] = useState([]);
   const [bookings, setBookings] = useState([]);
-
+  const [messageCount, setMessageCount] = useState(0);
   const { slug, city } = useParams();
   const location = useLocation();
-
+  const navigate = useNavigate();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug, city]);
@@ -202,6 +206,19 @@ const PropertyCard = () => {
     rating: averageRating,
     review_count: totalComment,
   };
+  const gallerySlides = [
+    ...(newProperties?.main_image_url
+      ? [{ src: newProperties.main_image_url }]
+      : []),
+    ...(newProperties?.gallery_images || [])
+      .filter((item) => item?.url)
+      .map((item) => ({
+        src: item.url,
+      })),
+  ];
+  const visibleBottomImages = newProperties?.gallery_images?.slice(2, 7) || [];
+  const maxVisibleImages = 8;
+  const remainingImages = Math.max(0, gallerySlides.length - maxVisibleImages);
   const propertyLocation = newProperties?.location;
 
   const hasPropertyLocation =
@@ -259,11 +276,24 @@ const PropertyCard = () => {
   const avatarRef = useRef(null);
   const dateRef = useRef(null);
   const guestRef = useRef(null);
+  const [isCompactScreen, setIsCompactScreen] = useState(false);
 
   const [avatar, setAvatar] = useState(false);
   const [open, setOpen] = useState(false);
   const [openGuest, setOpenGuest] = useState(false);
   const [expandedRoomDetails, setExpandedRoomDetails] = useState({});
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const updateScreen = () => setIsCompactScreen(mediaQuery.matches);
+
+    updateScreen();
+    mediaQuery.addEventListener("change", updateScreen);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateScreen);
+    };
+  }, []);
 
   const getInitialSearchState = () => {
     const params = new URLSearchParams(location.search);
@@ -356,7 +386,24 @@ const PropertyCard = () => {
       window.removeEventListener("user-updated", syncUser);
     };
   }, []);
+  useEffect(() => {
+    const loadMessageCount = async () => {
+      try {
+        if (!user?._id) return;
 
+        const res = await conversationService.getMy();
+        const list = res.data.metaData || [];
+
+        const realConversations = list.filter((item) => item.last_message);
+
+        setMessageCount(realConversations.length);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    loadMessageCount();
+  }, [user?._id]);
   useEffect(() => {
     const handleClickOutside = (e) => {
       const isInsideDropdown = [avatarRef, dateRef, guestRef].some(
@@ -605,25 +652,40 @@ const PropertyCard = () => {
   );
 
   console.log({ filteredRooms });
+  const handleStartChat = async () => {
+    try {
+      if (!properties?._id) return;
 
+      const res = await conversationService.createOrGet({
+        property_id: properties._id,
+      });
+
+      const conversationId = res.data.metaData._id;
+
+      navigate(`/message?conversation=${conversationId}`);
+    } catch (err) {
+      console.log(err);
+      alert(err?.response?.data?.message || "Không thể mở cuộc trò chuyện.");
+    }
+  };
   return (
     <>
       <div className="bg-primary pt-2 text-white">
         <div className="header container-custom pb-2">
           <div className="header_top">
-            <div className="top flex items-center justify-between pb-2 pt-1">
+            <div className="top flex flex-wrap items-center justify-between gap-3 pb-2 pt-1">
               <Link to={path.homePage}>
                 <Icon.logoBrand className="h-[24px] w-[144px]" />
               </Link>
 
-              <div className="flex items-center justify-center gap-2">
-                <span className="cursor-pointer px-3 py-2 font-medium hover:rounded-sm hover:bg-white/10">
+              <div className="flex max-w-full flex-wrap items-center justify-end gap-2">
+                <span className="hidden cursor-pointer px-3 py-2 font-medium hover:rounded-sm hover:bg-white/10 sm:inline-flex">
                   VND
                 </span>
-                <span className="cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10">
+                <span className="hidden cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10 sm:inline-flex">
                   <img src={flatVN} alt="" className="h-6 w-6 rounded-full" />
                 </span>
-                <span className="cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10">
+                <span className="hidden cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10 md:inline-flex">
                   <Icon.questionCircle className="w-5 fill-white" />
                 </span>
 
@@ -631,11 +693,21 @@ const PropertyCard = () => {
                   <>
                     <Link
                       to={path.hostDashboardPage}
-                      className="px-3 py-2 text-[16px] font-medium hover:rounded-sm hover:bg-white/10"
+                      className="hidden px-3 py-2 text-[15px] font-medium hover:rounded-sm hover:bg-white/10 md:inline-flex lg:text-[16px]"
                     >
                       Quản lý chỗ nghỉ
                     </Link>
-
+                    <Link
+                      to={path.message}
+                      className="relative px-3 py-2 text-[15px] font-medium hover:rounded-sm hover:bg-white/10 lg:text-[16px]"
+                    >
+                      Tin nhắn
+                      {messageCount > 0 && (
+                        <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
+                          {messageCount}
+                        </span>
+                      )}
+                    </Link>
                     <div ref={avatarRef} className="relative h-10 w-10">
                       <button
                         type="button"
@@ -652,7 +724,7 @@ const PropertyCard = () => {
                       {avatar && (
                         <div
                           onClick={(e) => e.stopPropagation()}
-                          className="absolute left-1/2 top-full z-30 mt-3 w-[260px] -translate-x-1/2 overflow-hidden rounded-[22px] border border-[#d9e2f1] bg-white text-[#1a1a1a] shadow-[0_22px_50px_rgba(0,0,0,0.18)]"
+                          className="absolute right-0 top-full z-30 mt-3 w-[min(260px,calc(100vw-32px))] overflow-hidden rounded-[22px] border border-[#d9e2f1] bg-white text-[#1a1a1a] shadow-[0_22px_50px_rgba(0,0,0,0.18)] sm:left-1/2 sm:right-auto sm:-translate-x-1/2"
                         >
                           <div className="border-b border-[#eef3fb] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] p-4">
                             <div className="flex items-center gap-3">
@@ -713,15 +785,15 @@ const PropertyCard = () => {
         </div>
       </div>
 
-      <div className="bg-[#f5f8ff] py-6">
+      <div className="bg-[#f5f8ff] py-4 sm:py-6">
         <div className="container-custom text-[#1a1a1a]">
-          <div className="rounded-[32px] bg-white p-6 shadow-[0_16px_45px_rgba(0,59,149,0.08)]">
+          <div className="rounded-[24px] bg-white p-4 shadow-[0_16px_45px_rgba(0,59,149,0.08)] sm:rounded-[32px] sm:p-6">
             <div className="border-b border-[#e4ecfb] pb-5">
-              <span className="block text-[34px] font-bold leading-tight text-primary">
+              <span className="block text-[28px] font-bold leading-tight text-primary sm:text-[34px]">
                 {newProperties?.title}
               </span>
 
-              <div className="mt-3 flex items-center gap-2 text-[15px] text-[#5f7291]">
+              <div className="mt-3 flex items-start gap-2 text-[15px] leading-6 text-[#5f7291]">
                 <span>
                   <Icon.localtion className={"w-[20px] fill-blue-600"} />
                 </span>
@@ -731,46 +803,74 @@ const PropertyCard = () => {
               </div>
             </div>
 
-            <div className="mt-6 flex gap-3">
-              <div className="h-[470px] w-[828px]">
-                <div className="grid grid-cols-12 gap-3">
-                  <div className="col-span-8">
+            <div className="mt-6 grid gap-3 lg:grid-cols-[minmax(0,1fr)_265px]">
+              <div className="min-w-0">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-12">
+                  <div className="sm:col-span-8">
                     <img
                       src={newProperties?.main_image_url}
-                      alt=""
-                      className="h-[359px] w-full rounded-md"
+                      alt={newProperties?.title}
+                      onClick={() => {
+                        setLightboxIndex(0);
+                        setLightboxOpen(true);
+                      }}
+                      className="h-[240px] w-full cursor-pointer rounded-md object-cover sm:h-[359px]"
                     />
                   </div>
 
-                  <div className="col-span-4 grid grid-rows-2 gap-3">
-                    {newProperties?.gallery_images?.slice(0, 2).map((item) => {
-                      return (
-                        <img
-                          key={item.url}
-                          src={item.url}
-                          alt=""
-                          className="h-[173px] w-full rounded-md"
-                        />
-                      );
-                    })}
+                  <div className="grid grid-cols-2 gap-3 sm:col-span-4 sm:grid-cols-1 sm:grid-rows-2">
+                    {newProperties?.gallery_images
+                      ?.slice(0, 2)
+                      .map((item, index) => {
+                        return (
+                          <img
+                            key={item.url}
+                            src={item.url}
+                            alt={newProperties?.title}
+                            onClick={() => {
+                              setLightboxIndex(index + 1);
+                              setLightboxOpen(true);
+                            }}
+                            className="h-[130px] w-full cursor-pointer rounded-md object-cover sm:h-[173px]"
+                          />
+                        );
+                      })}
                   </div>
 
-                  <div className="col-span-12 grid grid-cols-5 gap-3">
-                    {newProperties?.gallery_images?.slice(2, 7).map((item) => {
+                  <div className="grid grid-cols-2 gap-3 sm:col-span-12 sm:grid-cols-5">
+                    {visibleBottomImages.map((item, index) => {
+                      const isLastVisibleImage =
+                        index === visibleBottomImages.length - 1;
+                      const lightboxImageIndex = index + 3;
+
                       return (
-                        <img
+                        <div
                           key={item.url}
-                          src={item.url}
-                          alt=""
-                          className="h-[103px] w-[159px] rounded-md"
-                        />
+                          onClick={() => {
+                            setLightboxIndex(lightboxImageIndex);
+                            setLightboxOpen(true);
+                          }}
+                          className="relative h-[110px] w-full cursor-pointer overflow-hidden rounded-md sm:h-[103px]"
+                        >
+                          <img
+                            src={item.url}
+                            alt={newProperties?.title}
+                            className="h-full w-full object-cover transition duration-300 hover:scale-105"
+                          />
+
+                          {isLastVisibleImage && remainingImages > 0 && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/45 text-xl font-bold text-white">
+                              +{remainingImages} ảnh
+                            </div>
+                          )}
+                        </div>
                       );
                     })}
                   </div>
                 </div>
               </div>
 
-              <div className="flex w-[265px] flex-col gap-3">
+              <div className="flex w-full flex-col gap-3 lg:w-[265px]">
                 <div className="rounded-[24px] border border-[#dce7f6] bg-white p-4 shadow-[0_10px_30px_rgba(0,59,149,0.08)]">
                   <span className="block text-[12px] font-semibold uppercase tracking-[0.12em] text-[#6b7a99]">
                     Chủ sở hữu khách sạn
@@ -795,6 +895,13 @@ const PropertyCard = () => {
                       </span>
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={handleStartChat}
+                    className="mt-3 h-12 w-full rounded-2xl border border-[#006ce4] bg-white text-[15px] font-semibold text-[#006ce4] transition hover:bg-[#f3f8ff]"
+                  >
+                    Nhắn tin cho chủ chỗ nghỉ
+                  </button>
                 </div>
 
                 <div className="flex h-[230px] flex-col overflow-hidden rounded-[24px] border border-[#dce7f6] bg-[#f8fbff]">
@@ -990,7 +1097,7 @@ const PropertyCard = () => {
               )}
             </div>
           </div>
-          <div className="mt-6 rounded-[28px] border border-[#dbe7ff] bg-white p-6 shadow-[0_10px_35px_rgba(0,59,149,0.06)]">
+          <div className="mt-6 rounded-[24px] border border-[#dbe7ff] bg-white p-4 shadow-[0_10px_35px_rgba(0,59,149,0.06)] sm:rounded-[28px] sm:p-6">
             <span className="block text-24 text-primary">
               Tiện nghi nổi bật
             </span>
@@ -1019,22 +1126,22 @@ const PropertyCard = () => {
           <div className="mt-6 rounded-[28px] border border-[#dbe7ff] bg-white p-6 shadow-[0_10px_35px_rgba(0,59,149,0.06)]">
             <span className="mb-3 block text-24 text-primary">Phòng trống</span>
 
-            <div className="w-[800px] rounded-md bg-[#febb02] p-1 shadow-[0_14px_40px_rgba(0,59,149,0.14)]">
-              <div className="flex h-[54px] items-center rounded-[14px] bg-white">
-                <div className="bg-[#febb02] pr-1">
+            <div className="w-full rounded-md bg-[#febb02] p-1 shadow-[0_14px_40px_rgba(0,59,149,0.14)] lg:w-[800px]">
+              <div className="flex flex-col rounded-[14px] bg-white lg:h-[54px] lg:flex-row lg:items-center">
+                <div className="border-b border-[#febb02] bg-[#febb02] pb-1 lg:border-b-0 lg:pb-0 lg:pr-1">
                   <div
                     ref={dateRef}
-                    className="relative flex h-[54px] w-[300px] items-center justify-center rounded-l-none bg-white p-2"
+                    className="relative flex h-[54px] w-full items-center justify-center rounded-l-none bg-white p-2 lg:w-[300px]"
                   >
                     <button
                       onClick={() => {
                         setOpen((prev) => !prev);
                         setOpenGuest(false);
                       }}
-                      className="flex cursor-pointer items-center gap-2"
+                      className="flex w-full cursor-pointer items-center justify-center gap-2"
                     >
                       <Icon.calender className="w-6" />
-                      <span className="font-semibold text-[#1a1a1a]">
+                      <span className="min-w-0 truncate font-semibold text-[#1a1a1a]">
                         {format(start, "EEE, dd/MM", { locale: vi })}
                         <span className="px-1">-</span>
                         {format(end, "EEE, dd/MM", { locale: vi })}
@@ -1043,7 +1150,7 @@ const PropertyCard = () => {
 
                     {open && (
                       <div className="absolute left-0 top-full z-50 mt-2 w-full shadow-[0px_18px_40px_0px_rgba(26,26,26,0.18)]">
-                        <div className="mt-2 min-h-auto w-[700px] rounded-md bg-white text-primary-2 shadow-[0px_2px_16px_0px_#1a1a1a3d]">
+                        <div className="mt-2 min-h-auto w-[min(700px,calc(100vw-32px))] rounded-md bg-white text-primary-2 shadow-[0px_2px_16px_0px_#1a1a1a3d]">
                           <div className="h-full w-full">
                             <button
                               onClick={() => setMode("calendar")}
@@ -1067,8 +1174,10 @@ const PropertyCard = () => {
                                     setRange([item.selection])
                                   }
                                   minDate={getToday()}
-                                  months={2}
-                                  direction="horizontal"
+                                  months={isCompactScreen ? 1 : 2}
+                                  direction={
+                                    isCompactScreen ? "vertical" : "horizontal"
+                                  }
                                 />
                               )}
                             </div>
@@ -1079,10 +1188,10 @@ const PropertyCard = () => {
                   </div>
                 </div>
 
-                <div className="bg-[#febb02] pr-1">
+                <div className="border-b border-[#febb02] bg-[#febb02] pb-1 lg:border-b-0 lg:pb-0 lg:pr-1">
                   <div
                     ref={guestRef}
-                    className="relative h-[54px] w-[310px] bg-white p-3"
+                    className="relative h-[54px] w-full bg-white p-3 lg:w-[310px]"
                   >
                     <div
                       onClick={() => {
@@ -1104,8 +1213,8 @@ const PropertyCard = () => {
 
                     {openGuest && (
                       <div className="absolute right-0 top-full z-50">
-                        <div className="mt-2 h-auto w-[350px] rounded-md bg-white shadow-[0px_18px_40px_0px_rgba(26,26,26,0.18)]">
-                          <div className="flex h-full w-full flex-col items-center justify-between gap-3 p-8 font-semibold text-[#1a1a1a]">
+                        <div className="mt-2 h-auto w-[min(350px,calc(100vw-32px))] rounded-md bg-white shadow-[0px_18px_40px_0px_rgba(26,26,26,0.18)]">
+                          <div className="flex h-full w-full flex-col items-center justify-between gap-3 p-5 font-semibold text-[#1a1a1a] sm:p-8">
                             <div className="flex h-full w-full items-center justify-between">
                               <span className="font-semibold text-[#1a1a1a]">
                                 Khách
@@ -1183,7 +1292,7 @@ const PropertyCard = () => {
                   </div>
                 </div>
 
-                <div className="h-full w-full cursor-pointer rounded-r-md bg-primary-2 transition duration-200 hover:bg-[#003b95]">
+                <div className="h-[54px] w-full cursor-pointer rounded-b-md bg-primary-2 transition duration-200 hover:bg-[#003b95] lg:h-full lg:rounded-b-none lg:rounded-r-md">
                   <div className="flex h-full w-full items-center justify-center">
                     <button
                       onClick={handleSearch}
@@ -1196,8 +1305,9 @@ const PropertyCard = () => {
               </div>
             </div>
 
-            <div className="mt-4 h-full w-full">
-              <div className="mt-12 grid grid-cols-4 border border-[#cddff6] bg-primary font-semibold text-white">
+            <div className="mt-4 h-full w-full overflow-x-auto">
+              <div className="min-w-[760px]">
+              <div className="mt-8 grid grid-cols-4 border border-[#cddff6] bg-primary font-semibold text-white sm:mt-12">
                 <div className="z-10 border-r border-[#cddff6] p-3">
                   Loại chỗ nghỉ
                 </div>
@@ -1402,6 +1512,7 @@ const PropertyCard = () => {
                     </div>
                   </div>
                 ))}
+              </div>
             </div>
           </div>
 
@@ -1590,6 +1701,12 @@ const PropertyCard = () => {
       </div>
 
       <Footer />
+      <Lightbox
+        open={lightboxOpen}
+        close={() => setLightboxOpen(false)}
+        index={lightboxIndex}
+        slides={gallerySlides}
+      />
     </>
   );
 };

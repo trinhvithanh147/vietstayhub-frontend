@@ -74,7 +74,7 @@ const GuestFavoritesShowcase = () => {
   }, [properties, reviews]);
 
   return (
-    <section className="border border-[#dbe7ff] container-custom mt-14 rounded-[36px] bg-[linear-gradient(180deg,rgba(0,59,149,0.06)_0%,rgba(255,255,255,1)_100%)] px-5 py-8 text-[#1a1a1a] md:px-8">
+    <section className="container-custom mt-10 rounded-[24px] border border-[#dbe7ff] bg-[linear-gradient(180deg,rgba(0,59,149,0.06)_0%,rgba(255,255,255,1)_100%)] px-5 py-7 text-[#1a1a1a] sm:mt-14 sm:rounded-[32px] md:px-8 md:py-8 lg:rounded-[36px]">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div className="max-w-2xl">
           <span className="inline-flex rounded-full bg-[rgba(0,108,228,0.1)] px-4 py-1 text-sm font-semibold text-primary-2">
@@ -100,9 +100,10 @@ const GuestFavoritesShowcase = () => {
         pagination={{ clickable: true }}
         spaceBetween={20}
         breakpoints={{
-          320: { slidesPerView: 1 },
-          768: { slidesPerView: 2 },
-          1024: { slidesPerView: 3 },
+          320: { slidesPerView: 1, spaceBetween: 14 },
+          640: { slidesPerView: 1.35, spaceBetween: 16 },
+          768: { slidesPerView: 2, spaceBetween: 18 },
+          1024: { slidesPerView: 3, spaceBetween: 20 },
         }}
         className="guest-favorites-swiper mt-8"
       >
@@ -110,9 +111,9 @@ const GuestFavoritesShowcase = () => {
           <SwiperSlide key={item._id} className="h-auto pb-10">
             <Link
               to={`/properties/${item.city}/${item.slug}`}
-              className="group flex h-full min-h-[500px] flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_14px_36px_rgba(15,23,42,0.08)] ring-1 ring-[#e6eefb] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_55px_rgba(15,23,42,0.14)]"
+              className="group flex h-full min-h-[460px] flex-col overflow-hidden rounded-[22px] bg-white shadow-[0_14px_36px_rgba(15,23,42,0.08)] ring-1 ring-[#e6eefb] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_55px_rgba(15,23,42,0.14)] sm:rounded-[28px] md:min-h-[500px]"
             >
-              <div className="relative h-[250px] overflow-hidden">
+              <div className="relative h-[220px] overflow-hidden sm:h-[240px] md:h-[250px]">
                 <img
                   src={item.main_image_url}
                   alt={item.title}
@@ -125,15 +126,15 @@ const GuestFavoritesShowcase = () => {
                   </span>
                 </div>
                 <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
-                  <div className="max-w-[75%]">
-                    <span className="block text-[22px] font-bold leading-tight text-white">
+                  <div className="min-w-0 max-w-[70%]">
+                    <span className="block line-clamp-2 text-[18px] font-bold leading-tight text-white sm:text-[22px]">
                       {item.title}
                     </span>
                     <span className="mt-1 block truncate text-sm text-white/85">
                       {item.address}
                     </span>
                   </div>
-                  <div className="rounded-2xl bg-primary px-3 py-2 text-center text-white shadow-[0_10px_25px_rgba(0,59,149,0.24)]">
+                  <div className="shrink-0 rounded-2xl bg-primary px-3 py-2 text-center text-white shadow-[0_10px_25px_rgba(0,59,149,0.24)]">
                     <span className="block text-lg font-bold">
                       {item.averageRating || "Mới"}
                     </span>
@@ -163,7 +164,7 @@ const GuestFavoritesShowcase = () => {
                   </span>
                 </div>
 
-                <div className="mt-auto flex items-end justify-between gap-4 border-t border-[#e8eef8] pt-4">
+                <div className="mt-auto flex flex-col gap-3 border-t border-[#e8eef8] pt-4 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
                   <div>
                     <span className="block text-sm text-[#64748b]">Giá từ</span>
                     <span className="mt-1 block text-xl font-bold text-primary">

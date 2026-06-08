@@ -1,38 +1,38 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { roomService } from "../../../services/room.service";
 import proPertiesService from "../../../services/properties.service";
 
 const roomBadgeFields = [
-  ["balcony", "Ban công"],
-  ["air_conditioning", "Điều hòa"],
-  ["private_bathroom", "Phòng tắm riêng"],
-  ["terrace", "Sân hiên"],
-  ["free_wifi", "WiFi miễn phí"],
-  ["garden_view", "Nhìn ra vườn"],
-  ["courtyard_view", "Hướng sân trong"],
+  ["balcony", "Ban c�ng"],
+  ["air_conditioning", "�i?u h�a"],
+  ["private_bathroom", "Ph�ng t?m ri�ng"],
+  ["terrace", "S�n hi�n"],
+  ["free_wifi", "WiFi mi?n ph�"],
+  ["garden_view", "Nh�n ra vu?n"],
+  ["courtyard_view", "Hu?ng s�n trong"],
 ];
 
 const roomAmenityFields = [
-  ["toiletries", "Đồ dùng vệ sinh"],
-  ["shower", "Vòi sen"],
-  ["toilet", "Nhà vệ sinh"],
-  ["towels", "Khăn tắm"],
-  ["socket_near_bed", "Ổ điện gần giường"],
-  ["sitting_area", "Khu vực tiếp khách"],
-  ["private_entrance", "Lối vào riêng"],
-  ["slippers", "Dép"],
-  ["hair_dryer", "Máy sấy tóc"],
-  ["fan", "Quạt"],
-  ["electric_kettle", "Ấm đun nước"],
-  ["wardrobe", "Tủ quần áo"],
-  ["clothes_rack", "Giá treo đồ"],
-  ["toilet_paper", "Giấy vệ sinh"],
+  ["toiletries", "�? d�ng v? sinh"],
+  ["shower", "V�i sen"],
+  ["toilet", "Nh� v? sinh"],
+  ["towels", "Khan t?m"],
+  ["socket_near_bed", "? di?n g?n giu?ng"],
+  ["sitting_area", "Khu v?c ti?p kh�ch"],
+  ["private_entrance", "L?i v�o ri�ng"],
+  ["slippers", "D�p"],
+  ["hair_dryer", "M�y s?y t�c"],
+  ["fan", "Qu?t"],
+  ["electric_kettle", "?m dun nu?c"],
+  ["wardrobe", "T? qu?n �o"],
+  ["clothes_rack", "Gi� treo d?"],
+  ["toilet_paper", "Gi?y v? sinh"],
 ];
 
 const roomTypeOptions = [
-  { value: "standard_room", label: "Phòng tiêu chuẩn" },
-  { value: "deluxe_room", label: "Phòng deluxe" },
-  { value: "suite", label: "Phòng suite" },
+  { value: "standard_room", label: "Ph�ng ti�u chu?n" },
+  { value: "deluxe_room", label: "Ph�ng deluxe" },
+  { value: "suite", label: "Ph�ng suite" },
 ];
 
 const createInitialForm = () => ({
@@ -125,9 +125,9 @@ const ManageRoom = () => {
 
       const propertyTitle =
         typeof rawProperty === "object"
-          ? rawProperty?.title || "Chỗ nghỉ chưa xác định"
+          ? rawProperty?.title || "Ch? ngh? chua x�c d?nh"
           : properties.find((property) => property._id === rawProperty)?.title ||
-            "Chỗ nghỉ chưa xác định";
+            "Ch? ngh? chua x�c d?nh";
 
       if (!groups[propertyId]) {
         groups[propertyId] = {
@@ -150,7 +150,7 @@ const ManageRoom = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa phòng này không?")) return;
+    if (!window.confirm("B?n c� ch?c mu?n x�a ph�ng n�y kh�ng?")) return;
 
     try {
       await roomService.delete(id);
@@ -247,15 +247,15 @@ const ManageRoom = () => {
     <div className="rounded-[22px] border border-[#dbe7ff] bg-white p-4 shadow-[0_18px_55px_rgba(0,59,149,0.08)] sm:rounded-[28px] sm:p-6 md:p-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="text-[22px] font-bold text-[#0b2f6a]">Phòng</h2>
+          <h2 className="text-[22px] font-bold text-[#0b2f6a]">Ph�ng</h2>
           <p className="mt-1 text-sm text-[#5b6b86]">
-            Danh sách phòng trong toàn hệ thống.
+            Danh s�ch ph�ng trong to�n h? th?ng.
           </p>
         </div>
 
         <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
           <div className="rounded-2xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3">
-            <div className="text-xs font-semibold text-[#6a7da5]">Tổng</div>
+            <div className="text-xs font-semibold text-[#6a7da5]">T?ng</div>
             <div className="text-xl font-bold text-[#0b2f6a]">
               {totals.total}
             </div>
@@ -263,7 +263,7 @@ const ManageRoom = () => {
 
           <div className="rounded-2xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3">
             <div className="text-xs font-semibold text-[#6a7da5]">
-              Hết phòng
+              H?t ph�ng
             </div>
             <div className="text-xl font-bold text-[#0b2f6a]">
               {totals.outOfStock}
@@ -275,7 +275,7 @@ const ManageRoom = () => {
             onClick={load}
             className="col-span-2 h-11 rounded-2xl border border-[#dbe7ff] bg-white px-4 text-sm font-semibold text-[#0b2f6a] hover:bg-[#f6faff] sm:col-span-1"
           >
-            Tải lại
+            T?i l?i
           </button>
         </div>
       </div>
@@ -284,10 +284,10 @@ const ManageRoom = () => {
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <h3 className="text-lg font-bold text-[#0b2f6a]">
-              {editingId ? "Cập nhật phòng" : "Tạo phòng mới"}
+              {editingId ? "C?p nh?t ph�ng" : "T?o ph�ng m?i"}
             </h3>
             <p className="mt-1 text-sm text-[#5b6b86]">
-              Nhập giá gốc và phần trăm giảm, giá hiện tại sẽ tự tính.
+              Nh?p gi� g?c v� ph?n tram gi?m, gi� hi?n t?i s? t? t�nh.
             </p>
           </div>
 
@@ -297,7 +297,7 @@ const ManageRoom = () => {
               onClick={handleSubmit}
               className="h-11 rounded-2xl bg-[#006ce4] px-4 text-sm font-semibold text-white hover:bg-[#003b95]"
             >
-              {editingId ? "Cập nhật phòng" : "Tạo phòng"}
+              {editingId ? "C?p nh?t ph�ng" : "T?o ph�ng"}
             </button>
 
             <button
@@ -305,7 +305,7 @@ const ManageRoom = () => {
               onClick={handleReset}
               className="h-11 rounded-2xl border border-[#dbe7ff] bg-white px-4 text-sm font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
             >
-              Làm mới
+              L�m m?i
             </button>
           </div>
         </div>
@@ -317,7 +317,7 @@ const ManageRoom = () => {
             onChange={handleChange}
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           >
-            <option value="">Chọn chỗ nghỉ</option>
+            <option value="">Ch?n ch? ngh?</option>
             {properties.map((property) => (
               <option key={property._id} value={property._id}>
                 {property.title}
@@ -329,7 +329,7 @@ const ManageRoom = () => {
             name="name"
             value={form.name}
             onChange={handleChange}
-            placeholder="Tên phòng"
+            placeholder="T�n ph�ng"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
 
@@ -350,7 +350,7 @@ const ManageRoom = () => {
             name="original_price"
             value={form.original_price}
             onChange={handleChange}
-            placeholder="Giá gốc"
+            placeholder="Gi� g?c"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
 
@@ -358,7 +358,7 @@ const ManageRoom = () => {
             name="discount_percent"
             value={form.discount_percent}
             onChange={handleChange}
-            placeholder="Phần trăm giảm giá"
+            placeholder="Ph?n tram gi?m gi�"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
 
@@ -366,7 +366,7 @@ const ManageRoom = () => {
             name="price"
             value={form.price}
             readOnly
-            placeholder="Giá hiện tại tự tính"
+            placeholder="Gi� hi?n t?i t? t�nh"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-[#eef4ff] px-4 outline-none"
           />
 
@@ -374,7 +374,7 @@ const ManageRoom = () => {
             name="capacity"
             value={form.capacity}
             onChange={handleChange}
-            placeholder="Sức chứa"
+            placeholder="S?c ch?a"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
 
@@ -382,7 +382,7 @@ const ManageRoom = () => {
             name="quantity"
             value={form.quantity}
             onChange={handleChange}
-            placeholder="Số lượng phòng"
+            placeholder="S? lu?ng ph�ng"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
 
@@ -390,7 +390,7 @@ const ManageRoom = () => {
             name="bed_info"
             value={form.bed_info}
             onChange={handleChange}
-            placeholder="Thông tin giường"
+            placeholder="Th�ng tin giu?ng"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
 
@@ -398,7 +398,7 @@ const ManageRoom = () => {
             name="area"
             value={form.area}
             onChange={handleChange}
-            placeholder="Diện tích"
+            placeholder="Di?n t�ch"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
 
@@ -406,14 +406,14 @@ const ManageRoom = () => {
             name="view"
             value={form.view}
             onChange={handleChange}
-            placeholder="Hướng nhìn"
+            placeholder="Hu?ng nh�n"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
         </div>
 
         <div className="mt-4 rounded-2xl border border-[#dbe7ff] bg-white p-4">
           <div className="mb-3 text-sm font-semibold text-[#0b2f6a]">
-            Điểm nổi bật
+            �i?m n?i b?t
           </div>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-2">
             {roomBadgeFields.map(([key, label]) => (
@@ -435,7 +435,7 @@ const ManageRoom = () => {
 
         <div className="mt-4 rounded-2xl border border-[#dbe7ff] bg-white p-4">
           <div className="mb-3 text-sm font-semibold text-[#0b2f6a]">
-            Tiện nghi
+            Ti?n nghi
           </div>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-2">
             {roomAmenityFields.map(([key, label]) => (
@@ -460,26 +460,26 @@ const ManageRoom = () => {
       <div className="mt-6 overflow-hidden rounded-2xl border border-[#edf3ff]">
         <div className="flex flex-col gap-3 bg-[#f8fbff] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-sm font-semibold text-[#0b2f6a]">
-            Danh sách phòng
+            Danh s�ch ph�ng
           </span>
           <button
             type="button"
             onClick={() => setShowRoomList((prev) => !prev)}
             className="rounded-xl border border-[#dbe7ff] bg-white px-4 py-2 text-xs font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
           >
-            {showRoomList ? "Thu gọn danh sách" : "Mở danh sách"}
+            {showRoomList ? "Thu g?n danh s�ch" : "M? danh s�ch"}
           </button>
         </div>
 
         {!showRoomList ? (
           <div className="px-4 py-8 text-sm text-[#5b6b86]">
-            Danh sách phòng đang được thu gọn.
+            Danh s�ch ph�ng dang du?c thu g?n.
           </div>
         ) : loading ? (
-          <div className="px-4 py-8 text-sm text-[#5b6b86]">Đang tải...</div>
+          <div className="px-4 py-8 text-sm text-[#5b6b86]">�ang t?i...</div>
         ) : items.length === 0 ? (
           <div className="px-4 py-8 text-sm text-[#5b6b86]">
-            Không có phòng.
+            Kh�ng c� ph�ng.
           </div>
         ) : (
           <div className="space-y-4 px-4 py-4">
@@ -497,7 +497,7 @@ const ManageRoom = () => {
                         {group.propertyTitle}
                       </div>
                       <div className="mt-1 text-xs text-[#6a7da5]">
-                        {group.rooms.length} phòng
+                        {group.rooms.length} ph�ng
                       </div>
                     </div>
 
@@ -506,13 +506,13 @@ const ManageRoom = () => {
                       onClick={() => toggleRoomGroup(group.propertyId)}
                       className="rounded-xl border border-[#dbe7ff] bg-white px-4 py-2 text-xs font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
                     >
-                      {isCollapsed ? "Mở phòng" : "Thu gọn phòng"}
+                      {isCollapsed ? "M? ph�ng" : "Thu g?n ph�ng"}
                     </button>
                   </div>
 
                   {isCollapsed ? (
                     <div className="px-4 py-6 text-sm text-[#5b6b86]">
-                      Nhóm phòng này đang được thu gọn.
+                      Nh�m ph�ng n�y dang du?c thu g?n.
                     </div>
                   ) : (
                     <>
@@ -528,12 +528,12 @@ const ManageRoom = () => {
                                 ? r.property_id?.title || group.propertyTitle
                                 : group.propertyTitle}
                             </div>
-                            <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
+                            <div className="mt-3 grid grid-cols-2 gap-3 text-xs text-[#5b6b86]">
                               <div>
                                 <span className="block font-semibold text-[#6a7da5]">
-                                  Loại phòng
+                                  Lo?i ph�ng
                                 </span>
-                                <span className="mt-1 block">
+                                <span className="mt-1 block text-[#0b2f6a]">
                                   {roomTypeOptions.find(
                                     (item) => item.value === r.room_type,
                                   )?.label ||
@@ -543,9 +543,11 @@ const ManageRoom = () => {
                               </div>
                               <div>
                                 <span className="block font-semibold text-[#6a7da5]">
-                                  Số lượng
+                                  S? lu?ng
                                 </span>
-                                <span className="mt-1 block">{r.quantity ?? 0}</span>
+                                <span className="mt-1 block text-[#0b2f6a]">
+                                  {r.quantity ?? 0}
+                                </span>
                               </div>
                             </div>
                             <div className="mt-3 text-sm font-semibold">
@@ -557,14 +559,14 @@ const ManageRoom = () => {
                                 onClick={() => handleEdit(r)}
                                 className="h-10 rounded-xl bg-[#006ce4] px-3 text-xs font-semibold text-white hover:bg-[#003b95]"
                               >
-                                Sửa
+                                S?a
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleDelete(r._id)}
                                 className="h-10 rounded-xl border border-[#ffd0d0] bg-[#fff5f5] px-3 text-xs font-semibold text-[#b42318] hover:bg-[#ffecec]"
                               >
-                                Xóa
+                                X�a
                               </button>
                             </div>
                           </div>
@@ -574,11 +576,11 @@ const ManageRoom = () => {
                       <div className="hidden overflow-x-auto lg:block">
                         <div className="min-w-[820px]">
                       <div className="grid grid-cols-[1.2fr_0.9fr_0.6fr_0.6fr_0.7fr] gap-3 bg-[#f8fbff] px-4 py-3 text-xs font-semibold tracking-[0.06em] text-[#6a7da5]">
-                        <div>Tên phòng</div>
-                        <div>Loại phòng</div>
-                        <div>Giá</div>
-                        <div>Số lượng</div>
-                        <div>Thao tác</div>
+                        <div>T�n ph�ng</div>
+                        <div>Lo?i ph�ng</div>
+                        <div>Gi�</div>
+                        <div>S? lu?ng</div>
+                        <div>Thao t�c</div>
                       </div>
 
                       <div className="divide-y divide-[#edf3ff]">
@@ -620,14 +622,14 @@ const ManageRoom = () => {
                                 onClick={() => handleEdit(r)}
                                 className="mr-2 h-9 rounded-xl bg-[#006ce4] px-3 text-xs font-semibold text-white hover:bg-[#003b95]"
                               >
-                                Sửa
+                                S?a
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleDelete(r._id)}
                                 className="h-9 rounded-xl border border-[#ffd0d0] bg-[#fff5f5] px-3 text-xs font-semibold text-[#b42318] hover:bg-[#ffecec]"
                               >
-                                Xóa
+                                X�a
                               </button>
                             </div>
                           </div>

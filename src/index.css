@@ -8,6 +8,11 @@
     box-sizing: border-box;
   }
 
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
   body {
     font-size: 14px;
     font-weight: 400;
@@ -28,9 +33,45 @@
     cursor: not-allowed;
   }
 
+  input,
+  select,
+  textarea {
+    min-width: 0;
+    max-width: 100%;
+  }
+
   .container-custom {
-    max-width: 1200px;
+    width: min(100% - 32px, 1200px);
     margin: 0 auto;
+  }
+
+  @media (min-width: 768px) {
+    .container-custom {
+      width: min(100% - 48px, 1200px);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .container-custom {
+      width: min(100% - 64px, 1200px);
+    }
+  }
+
+  .rdrCalendarWrapper,
+  .rdrDateRangeWrapper,
+  .rdrMonth {
+    max-width: 100%;
+  }
+
+  @media (max-width: 767px) {
+    .rdrCalendarWrapper {
+      font-size: 12px;
+    }
+
+    .rdrMonth {
+      width: 100% !important;
+      padding: 0 8px 12px;
+    }
   }
 }
 

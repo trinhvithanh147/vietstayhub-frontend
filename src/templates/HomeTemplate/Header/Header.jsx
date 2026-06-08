@@ -16,6 +16,7 @@ import proPertiesService from "../../../services/properties.service";
 import { roomService } from "../../../services/room.service";
 import { BookingService } from "../../../services/booking.service";
 import { userService } from "../../../services/users.service";
+import { conversationService } from "../../../services/conversation.service";
 
 const cityLabelMap = {
   "da-lat": "Đà Lạt",
@@ -145,11 +146,12 @@ const getStoredUser = () => {
 const Header = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(() => getStoredUser());
-
+  const [messageCount, setMessageCount] = useState(0);
   const avatarRef = useRef(null);
   const dateRef = useRef(null);
   const guestRef = useRef(null);
   const destinationRef = useRef(null);
+  const [isCompactScreen, setIsCompactScreen] = useState(false);
 
   const [avatar, setAvatar] = useState(false);
   const [open, setOpen] = useState(false);
@@ -176,6 +178,18 @@ const Header = () => {
     rooms: 1,
   });
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const updateScreen = () => setIsCompactScreen(mediaQuery.matches);
+
+    updateScreen();
+    mediaQuery.addEventListener("change", updateScreen);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateScreen);
+    };
+  }, []);
+
   const start = range[0].startDate;
   const end = range[0].endDate;
 
@@ -192,7 +206,24 @@ const Header = () => {
       window.removeEventListener("user-updated", syncUser);
     };
   }, []);
+  useEffect(() => {
+    const loadMessageCount = async () => {
+      try {
+        if (!user?._id) return;
 
+        const res = await conversationService.getMy();
+        const list = res.data.metaData || [];
+
+        const realConversations = list.filter((item) => item.last_message);
+
+        setMessageCount(realConversations.length);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    loadMessageCount();
+  }, [user?._id]);
   useEffect(() => {
     const loadSearchData = async () => {
       try {
@@ -459,21 +490,21 @@ const Header = () => {
       <div className="bg-primary pt-2 text-white">
         <div className="header container-custom">
           <div className="header_top">
-            <div className="top flex items-center justify-between pb-2 pt-1">
+            <div className="top flex flex-wrap items-center justify-between gap-3 pb-2 pt-1">
               <Link to={path.homePage}>
                 <Icon.logoBrand className="h-[24px] w-[144px]" />
               </Link>
 
-              <div className="flex items-center justify-center gap-2">
-                <span className="cursor-pointer px-3 py-2 font-medium hover:rounded-sm hover:bg-white/10">
+              <div className="flex max-w-full flex-wrap items-center justify-end gap-2">
+                <span className="hidden cursor-pointer px-3 py-2 font-medium hover:rounded-sm hover:bg-white/10 sm:inline-flex">
                   VND
                 </span>
 
-                <span className="cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10">
+                <span className="hidden cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10 sm:inline-flex">
                   <img src={flatVN} alt="" className="h-6 w-6 rounded-full" />
                 </span>
 
-                <span className="cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10">
+                <span className="hidden cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10 md:inline-flex">
                   <Icon.questionCircle className="w-5 fill-white" />
                 </span>
 
@@ -481,11 +512,21 @@ const Header = () => {
                   <>
                     <Link
                       to={path.hostDashboardPage}
-                      className="px-3 py-2 text-[16px] font-medium hover:rounded-sm hover:bg-white/10"
+                      className="hidden px-3 py-2 text-[15px] font-medium hover:rounded-sm hover:bg-white/10 md:inline-flex lg:text-[16px]"
                     >
                       Quản lý chỗ nghỉ
                     </Link>
-
+                    <Link
+                      to={path.message}
+                      className="relative px-3 py-2 text-[15px] font-medium hover:rounded-sm hover:bg-white/10 lg:text-[16px]"
+                    >
+                      Tin nhắn
+                      {messageCount > 0 && (
+                        <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
+                          {messageCount}
+                        </span>
+                      )}
+                    </Link>
                     <div ref={avatarRef} className="relative z-[100] h-10 w-10">
                       <button
                         type="button"
@@ -502,7 +543,7 @@ const Header = () => {
                       {avatar && (
                         <div
                           onClick={(e) => e.stopPropagation()}
-                          className="absolute left-1/2 top-full z-[120] mt-3 w-[260px] -translate-x-1/2 overflow-hidden rounded-[22px] border border-[#d9e2f1] bg-white text-[#1a1a1a] shadow-[0_22px_50px_rgba(0,0,0,0.18)]"
+                          className="absolute right-0 top-full z-[120] mt-3 w-[min(260px,calc(100vw-32px))] overflow-hidden rounded-[22px] border border-[#d9e2f1] bg-white text-[#1a1a1a] shadow-[0_22px_50px_rgba(0,0,0,0.18)] sm:left-1/2 sm:right-auto sm:-translate-x-1/2"
                         >
                           <div className="border-b border-[#eef3fb] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] p-4">
                             <div className="flex items-center gap-3">
@@ -562,46 +603,48 @@ const Header = () => {
                 )}
               </div>
             </div>
-            <div className="bot flex items-center">
-              <Link className="flex items-center gap-2 rounded-3xl border bg-white/10 px-4 py-[11px]">
+            <div className="bot -mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+              <Link className="flex shrink-0 items-center gap-2 rounded-3xl border bg-white/10 px-4 py-[11px]">
                 <Icon.stay className="h-5 w-5 fill-white" />
                 <span>Lưu trú</span>
               </Link>
 
-              <Link className="flex items-center gap-2 rounded-3xl px-4 py-[11px] transition duration-300 hover:bg-white/10">
+              <Link className="flex shrink-0 items-center gap-2 rounded-3xl px-4 py-[11px] transition duration-300 hover:bg-white/10">
                 <Icon.flight className="h-5 w-5 fill-white" />
                 <span>Chuyến bay</span>
               </Link>
 
-              <Link className="flex items-center gap-2 rounded-3xl px-4 py-[11px] hover:bg-white/10">
+              <Link className="flex shrink-0 items-center gap-2 rounded-3xl px-4 py-[11px] hover:bg-white/10">
                 <Icon.earth className="h-5 w-5 fill-white" />
                 <span>Chuyến bay + Khách sạn</span>
               </Link>
 
-              <Link className="flex items-center gap-2 rounded-3xl px-4 py-[11px] hover:bg-white/10">
+              <Link className="flex shrink-0 items-center gap-2 rounded-3xl px-4 py-[11px] hover:bg-white/10">
                 <Icon.activities className="h-5 w-5 fill-white" />
                 <span>Hoạt động</span>
               </Link>
 
-              <Link className="flex items-center gap-2 rounded-3xl px-4 py-[11px] hover:bg-white/10">
+              <Link className="flex shrink-0 items-center gap-2 rounded-3xl px-4 py-[11px] hover:bg-white/10">
                 <Icon.taxi className="h-5 w-5 fill-white" />
                 <span>Taxi sân bay</span>
               </Link>
             </div>
           </div>
 
-          <div className="header_bottom relative z-30 overflow-visible pb-[98px] pt-[64px]">
-            <h1 className="text-48 inline">Tìm chỗ nghỉ tiếp theo</h1>
-            <h2 className="mt-1 pb-3 text-24">
+          <div className="header_bottom relative z-30 overflow-visible pb-8 pt-10 md:pb-10 md:pt-14 lg:pb-[98px] lg:pt-[64px]">
+            <h1 className="block text-[34px] font-bold leading-tight sm:text-[42px] lg:text-[48px] lg:leading-[62px]">
+              Tìm chỗ nghỉ tiếp theo
+            </h1>
+            <h2 className="mt-2 pb-3 text-[18px] font-bold leading-7 sm:text-[22px] lg:text-[24px] lg:leading-8">
               Tìm ưu đãi, chỗ nghỉ dạng nhà và nhiều hơn nữa
             </h2>
 
             <div
               id="search-form"
-              className="absolute bottom-0 left-0 z-40 mt-10 w-[1060px] translate-y-1/2 rounded-md bg-[#febb02] p-[5px] shadow-[0_16px_45px_rgba(0,59,149,0.24)]"
+              className="relative z-40 mt-6 w-full rounded-md bg-[#febb02] p-[5px] shadow-[0_16px_45px_rgba(0,59,149,0.24)] lg:absolute lg:bottom-0 lg:left-0 lg:mt-10 lg:w-[min(1060px,100%)] lg:translate-y-1/2"
             >
               <div className="flex h-auto flex-col overflow-visible rounded-md bg-white lg:h-[54px] lg:flex-row">
-                <div className="border-r-[4px] border-[#febb02]">
+                <div className="border-b-[4px] border-[#febb02] lg:border-b-0 lg:border-r-[4px]">
                   <div
                     ref={destinationRef}
                     className="relative h-[54px] w-full bg-white p-2 lg:w-[350px] lg:rounded-l-[12px] lg:rounded-tr-none"
@@ -660,7 +703,7 @@ const Header = () => {
                   </div>
                 </div>
 
-                <div className="border-r-[4px] border-[#febb02]">
+                <div className="border-b-[4px] border-[#febb02] lg:border-b-0 lg:border-r-[4px]">
                   <div
                     ref={dateRef}
                     className="relative flex h-[54px] w-full items-center bg-white p-2 lg:w-[297px]"
@@ -671,10 +714,10 @@ const Header = () => {
                         setOpenGuest(false);
                         setShowSuggestions(false);
                       }}
-                      className="flex cursor-pointer items-center gap-2"
+                      className="flex w-full cursor-pointer items-center gap-2"
                     >
                       <Icon.calender className="w-6" />
-                      <span className="font-semibold text-[#1a1a1a]">
+                      <span className="min-w-0 truncate font-semibold text-[#1a1a1a]">
                         {format(start, "EEE, dd/MM", { locale: vi })}
                         <span className="px-1">—</span>
                         {format(end, "EEE, dd/MM", { locale: vi })}
@@ -682,8 +725,8 @@ const Header = () => {
                     </button>
 
                     {open && (
-                      <div className="absolute left-0 top-full z-50">
-                        <div className="mt-2 min-h-auto w-[700px] overflow-hidden rounded-[24px] bg-white text-primary-2 shadow-[0px_18px_40px_0px_rgba(26,26,26,0.18)]">
+                      <div className="absolute left-0 top-full z-50 w-full sm:w-auto">
+                        <div className="mt-2 min-h-auto w-[min(700px,calc(100vw-32px))] overflow-hidden rounded-[24px] bg-white text-primary-2 shadow-[0px_18px_40px_0px_rgba(26,26,26,0.18)]">
                           <div className="h-full w-full">
                             <button
                               onClick={() => setMode("calendar")}
@@ -710,8 +753,10 @@ const Header = () => {
                                     setRange([item.selection])
                                   }
                                   minDate={getToday()}
-                                  months={2}
-                                  direction="horizontal"
+                                  months={isCompactScreen ? 1 : 2}
+                                  direction={
+                                    isCompactScreen ? "vertical" : "horizontal"
+                                  }
                                 />
                               )}
                             </div>
@@ -722,7 +767,7 @@ const Header = () => {
                   </div>
                 </div>
 
-                <div className="border-r-[4px] border-[#febb02]">
+                <div className="border-b-[4px] border-[#febb02] lg:border-b-0 lg:border-r-[4px]">
                   <div
                     ref={guestRef}
                     className="relative h-[54px] w-full bg-white p-3 lg:w-[310px]"
@@ -750,8 +795,8 @@ const Header = () => {
 
                     {openGuest && (
                       <div className="absolute right-0 top-full z-50">
-                        <div className="mt-2 h-auto w-[350px] rounded-[20px] bg-white shadow-[0px_18px_40px_0px_rgba(26,26,26,0.18)]">
-                          <div className="flex h-full w-full flex-col items-center justify-between gap-3 p-8 font-semibold text-[#1a1a1a]">
+                        <div className="mt-2 h-auto w-[min(350px,calc(100vw-32px))] rounded-[20px] bg-white shadow-[0px_18px_40px_0px_rgba(26,26,26,0.18)]">
+                          <div className="flex h-full w-full flex-col items-center justify-between gap-3 p-5 font-semibold text-[#1a1a1a] sm:p-8">
                             <div className="flex h-full w-full items-center justify-between">
                               <span className="font-semibold text-[#1a1a1a]">
                                 Người

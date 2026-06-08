@@ -4,8 +4,13 @@ const proPertiesService = {
   getAll: () => {
     return http.get("/properties/getAll");
   },
-  getCity: (city) => {
-    return http.get(`/properties/${city}`);
+  getCity: (city, page = 1, limit = 10) => {
+    return http.get(`/properties/${city}`, {
+      params: {
+        page,
+        limit,
+      },
+    });
   },
   getSlug: (slug, city) => {
     return http.get(`/properties/${city}/${slug}`);

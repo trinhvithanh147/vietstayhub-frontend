@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { userService } from "../../../services/users.service";
+import { validateRegister } from "../../../utils/validate";
 
 const initialForm = {
   full_name: "",
@@ -96,20 +97,30 @@ const ManageUser = () => {
   };
 
   const handleSubmit = async () => {
+    const errorMessage = validateRegister(form, {
+      isEditing: Boolean(editingId),
+      requireConfirmPassword: false,
+    });
+
+    if (errorMessage) {
+      alert(errorMessage);
+      return;
+    }
+
     try {
       let targetUserId = editingId;
 
       if (editingId) {
         const payload = {
-          full_name: form.full_name,
+          full_name: form.full_name.trim(),
           role: form.role,
-          phone_number: form.phone_number,
+          phone_number: form.phone_number.trim(),
           gender: form.gender,
-          home_address: form.home_address,
+          home_address: form.home_address.trim(),
         };
 
         if (form.password?.trim()) {
-          payload.password = form.password;
+          payload.password = form.password.trim();
         }
 
         await userService.update(editingId, payload);
@@ -121,7 +132,13 @@ const ManageUser = () => {
         }
       } else {
         const payload = {
-          ...form,
+          full_name: form.full_name.trim(),
+          email: form.email.trim().toLowerCase(),
+          password: form.password,
+          role: form.role,
+          phone_number: form.phone_number.trim(),
+          gender: form.gender,
+          home_address: form.home_address.trim(),
         };
 
         const createRes = await userService.create(payload);
@@ -146,10 +163,17 @@ const ManageUser = () => {
         }
       }
 
+      alert(
+        editingId
+          ? "Cập nhật tài khoản thành công."
+          : "Tạo tài khoản thành công.",
+      );
+
       handleReset();
       await load();
     } catch (err) {
       console.log(err);
+      alert(err?.response?.data?.message || "Thao tác thất bại.");
     }
   };
 
@@ -230,6 +254,7 @@ const ManageUser = () => {
             value={form.email}
             onChange={handleChange}
             disabled={Boolean(editingId)}
+            type="email"
             placeholder="Email"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none disabled:bg-[#f2f6fc] focus:border-[#006ce4]"
           />

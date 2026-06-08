@@ -5,6 +5,7 @@ import flatVN from "../../assets/images/Vn@3x.png";
 import defaultAvatar from "../../assets/images/avatar-default.jpg";
 import { path } from "../../hooks/path";
 import { userService } from "../../services/users.service";
+import { validateProfile } from "../../utils/validate";
 
 const getUserIdFromToken = () => {
   try {
@@ -208,9 +209,25 @@ const UserProfile = () => {
     e.preventDefault();
     if (!user?._id) return;
 
+    const errorMessage = validateProfile(form);
+
+    if (errorMessage) {
+      alert(errorMessage);
+      return;
+    }
+
     try {
       setIsSaving(true);
-      const res = await userService.update(user._id, form);
+
+      const payload = {
+        full_name: form.full_name.trim(),
+        phone_number: form.phone_number.trim(),
+        gender: form.gender,
+        home_address: form.home_address.trim(),
+      };
+
+      const res = await userService.update(user._id, payload);
+
       const updatedUser = {
         ...user,
         ...res.data.metaData,
@@ -218,6 +235,7 @@ const UserProfile = () => {
 
       setUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
+
       alert("Cập nhật thông tin thành công.");
     } catch (err) {
       console.log(err);
@@ -249,6 +267,14 @@ const UserProfile = () => {
       </div>
 
       <div className="container-custom py-10">
+        <button
+          type="button"
+          onClick={() => navigate(path.homePage)}
+          className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#dbe7ff] bg-white px-5 py-3 text-sm font-semibold text-[#003b95] shadow-sm transition-all duration-300 hover:-translate-x-1 hover:bg-[#f3f8ff] hover:shadow-md"
+        >
+          <span className="text-lg leading-none">←</span>
+          <span>Quay về</span>
+        </button>
         <div className="grid gap-8 xl:grid-cols-[360px_1fr]">
           <aside className="rounded-[32px] border border-[#dbe7ff] bg-[linear-gradient(135deg,#003b95_0%,#006ce4_100%)] p-8 text-white shadow-[0_24px_60px_rgba(0,59,149,0.22)]">
             <span className="inline-flex rounded-full bg-white/15 px-4 py-2 text-[13px] font-semibold uppercase tracking-[0.24em] text-white/85">
@@ -342,13 +368,6 @@ const UserProfile = () => {
                   chỗ nghỉ thuận tiện hơn.
                 </p>
               </div>
-
-              <Link
-                to={path.hostDashboardPage}
-                className="inline-flex items-center justify-center rounded-xl border border-[#cfdcf1] bg-white px-4 py-3 text-[14px] font-semibold text-[#26446d] transition hover:bg-[#f7fbff]"
-              >
-                Quay lại quản lý chỗ nghỉ
-              </Link>
             </div>
             <div className="mt-8 flex rounded-2xl border border-[#dbe7ff] bg-[#f7fbff] p-1">
               <button
