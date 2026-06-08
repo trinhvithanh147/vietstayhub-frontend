@@ -22,4 +22,7 @@ export const BookingService = {
   createPayOSPayment: (bookingId) => {
     return http.post(`/booking/payos/create/${bookingId}`);
   },
+  syncPayOSPaymentStatus: (bookingId) => {
+    return http.get(`/booking/payos/status/${bookingId}`);
+  },
 };
