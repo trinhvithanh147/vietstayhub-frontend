@@ -21,6 +21,8 @@ const createInitialForm = () => ({
   slug: "",
   address: "",
   city: "da-lat",
+  location_lat: "",
+  location_lng: "",
   country: "Viet Nam",
   type: "hotel",
   base_price: "",
@@ -32,7 +34,7 @@ const createInitialForm = () => ({
   max_stay_days: 30,
   user_id: "",
   amenities: Object.fromEntries(
-    propertyAmenityFields.map(([key]) => [key, false])
+    propertyAmenityFields.map(([key]) => [key, false]),
   ),
 });
 
@@ -41,6 +43,8 @@ const buildFormFromProperty = (property) => ({
   slug: property.slug || "",
   address: property.address || "",
   city: property.city || "da-lat",
+  location_lat: property.location?.lat ?? "",
+  location_lng: property.location?.lng ?? "",
   country: property.country || "Viet Nam",
   type: property.type || "hotel",
   base_price: String(property.base_price ?? ""),
@@ -91,7 +95,7 @@ const ManageProperty = () => {
           : {
               ...prev,
               user_id: loadedUsers[0]?._id || "",
-            }
+            },
       );
     } catch (err) {
       console.log(err);
@@ -124,9 +128,7 @@ const ManageProperty = () => {
           ? rawUser
           : users.find((user) => user._id === rawUser) || null;
       const ownerName =
-        matchedUser?.full_name ||
-        matchedUser?.email ||
-        "Chưa gắn chủ sở hữu";
+        matchedUser?.full_name || matchedUser?.email || "Chưa gắn chủ sở hữu";
       const ownerEmail = matchedUser?.email || "";
 
       if (!groups[ownerId]) {
@@ -221,6 +223,10 @@ const ManageProperty = () => {
       slug: form.slug.trim(),
       address: form.address.trim(),
       city: form.city,
+      location: {
+        lat: form.location_lat === "" ? null : Number(form.location_lat),
+        lng: form.location_lng === "" ? null : Number(form.location_lng),
+      },
       country: form.country.trim(),
       type: "hotel",
       base_price: Number(form.base_price) || 0,
@@ -279,9 +285,7 @@ const ManageProperty = () => {
             </div>
           </div>
           <div className="rounded-2xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3">
-            <div className="text-xs font-semibold text-[#6a7da5]">
-              Nổi bật
-            </div>
+            <div className="text-xs font-semibold text-[#6a7da5]">Nổi bật</div>
             <div className="text-xl font-bold text-[#0b2f6a]">
               {totals.preferred}
             </div>
@@ -365,7 +369,25 @@ const ManageProperty = () => {
             <option value="ho-chi-minh">ho-chi-minh</option>
             <option value="vung-tau">vung-tau</option>
           </select>
+          <input
+            name="location_lat"
+            type="number"
+            step="any"
+            value={form.location_lat}
+            onChange={handleChange}
+            placeholder="Vĩ độ - Latitude"
+            className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
+          />
 
+          <input
+            name="location_lng"
+            type="number"
+            step="any"
+            value={form.location_lng}
+            onChange={handleChange}
+            placeholder="Kinh độ - Longitude"
+            className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
+          />
           <input
             name="country"
             value={form.country}
@@ -459,15 +481,17 @@ const ManageProperty = () => {
             key={`admin-main-image-${propertyImageInputKey}`}
             type="file"
             accept="image/*"
-            onChange={(event) => setMainImageFile(event.target.files?.[0] || null)}
+            onChange={(event) =>
+              setMainImageFile(event.target.files?.[0] || null)
+            }
             className="mt-3 block w-full rounded-xl border border-[#dbe7ff] bg-[#f8fbff] px-3 py-2 text-sm text-[#0b2f6a] file:mr-3 file:rounded-lg file:border-0 file:bg-[#006ce4] file:px-3 file:py-2 file:text-white"
           />
           <div className="mt-2 text-xs text-[#6a7da5]">
             {mainImageFile
               ? `Đã chọn: ${mainImageFile.name}`
               : form.main_image_url
-              ? "Chưa chọn file mới. Giữ ảnh chính hiện tại."
-              : "Chưa có ảnh chính."}
+                ? "Chưa chọn file mới. Giữ ảnh chính hiện tại."
+                : "Chưa có ảnh chính."}
           </div>
         </div>
 
@@ -537,7 +561,8 @@ const ManageProperty = () => {
                         {group.ownerName}
                       </div>
                       <div className="mt-1 text-xs text-[#6a7da5]">
-                        {group.ownerEmail || "Chưa có email"} • {group.properties.length} chỗ nghỉ
+                        {group.ownerEmail || "Chưa có email"} •{" "}
+                        {group.properties.length} chỗ nghỉ
                       </div>
                     </div>
                     <button
@@ -561,7 +586,9 @@ const ManageProperty = () => {
                             key={p._id}
                             className="rounded-2xl border border-[#dbe7ff] bg-white p-4 text-sm text-[#0b2f6a]"
                           >
-                            <div className="font-semibold">{p.title || "-"}</div>
+                            <div className="font-semibold">
+                              {p.title || "-"}
+                            </div>
                             <div className="mt-1 break-words text-xs text-[#6a7da5]">
                               {p.address || ""}
                             </div>
@@ -570,14 +597,17 @@ const ManageProperty = () => {
                                 <span className="block font-semibold text-[#6a7da5]">
                                   Thành phố
                                 </span>
-                                <span className="mt-1 block">{p.city || "-"}</span>
+                                <span className="mt-1 block">
+                                  {p.city || "-"}
+                                </span>
                               </div>
                               <div>
                                 <span className="block font-semibold text-[#6a7da5]">
                                   Giá
                                 </span>
                                 <span className="mt-1 block">
-                                  {(p.base_price || 0).toLocaleString("vi-VN")} VND
+                                  {(p.base_price || 0).toLocaleString("vi-VN")}{" "}
+                                  VND
                                 </span>
                               </div>
                             </div>
@@ -614,69 +644,71 @@ const ManageProperty = () => {
 
                       <div className="hidden overflow-x-auto lg:block">
                         <div className="min-w-[820px]">
-                      <div className="grid grid-cols-[1.3fr_0.7fr_0.7fr_0.7fr_0.7fr] gap-3 bg-[#f8fbff] px-4 py-3 text-xs font-semibold tracking-[0.06em] text-[#6a7da5]">
-                        <div>Tên chỗ nghỉ</div>
-                        <div>Thành phố</div>
-                        <div>Giá</div>
-                        <div>Nổi bật</div>
-                        <div>Hành động</div>
-                      </div>
-
-                      <div className="divide-y divide-[#edf3ff]">
-                        {group.properties.map((p) => (
-                          <div
-                            key={p._id}
-                            className="grid grid-cols-[1.3fr_0.7fr_0.7fr_0.7fr_0.7fr] gap-3 px-4 py-4 text-sm text-[#0b2f6a]"
-                          >
-                            <div className="min-w-0">
-                              <div className="truncate font-semibold">{p.title || "-"}</div>
-                              <div className="truncate text-xs text-[#6a7da5]">
-                                {p.address || ""}
-                              </div>
-                              
-                            </div>
-
-                            <div className="truncate text-[#5b6b86]">
-                              {p.city || "-"}
-                            </div>
-
-                            <div className="font-semibold">
-                              {(p.base_price || 0).toLocaleString("vi-VN")} VND
-                            </div>
-
-                            <div>
-                              <span className="inline-flex rounded-full border border-[#dbe7ff] bg-[#f6faff] px-3 py-1 text-xs font-semibold text-[#0b2f6a]">
-                                {p.is_preferred ? "Có" : "Không"}
-                              </span>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => handleEdit(p)}
-                                className="h-9 rounded-xl bg-[#006ce4] px-3 text-xs font-semibold text-white hover:bg-[#003b95]"
-                              >
-                                Sửa
-                              </button>
-
-                              <Link
-                                to={`/properties/${p.city}/${p.slug}`}
-                                className="flex h-9 items-center rounded-xl border border-[#dbe7ff] bg-white px-3 text-xs font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
-                              >
-                                Mở
-                              </Link>
-
-                              <button
-                                type="button"
-                                onClick={() => handleDelete(p._id)}
-                                className="h-9 rounded-xl border border-[#ffd0d0] bg-[#fff5f5] px-3 text-xs font-semibold text-[#b42318] hover:bg-[#ffecec]"
-                              >
-                                Xóa
-                              </button>
-                            </div>
+                          <div className="grid grid-cols-[1.3fr_0.7fr_0.7fr_0.7fr_0.7fr] gap-3 bg-[#f8fbff] px-4 py-3 text-xs font-semibold tracking-[0.06em] text-[#6a7da5]">
+                            <div>Tên chỗ nghỉ</div>
+                            <div>Thành phố</div>
+                            <div>Giá</div>
+                            <div>Nổi bật</div>
+                            <div>Hành động</div>
                           </div>
-                        ))}
-                      </div>
+
+                          <div className="divide-y divide-[#edf3ff]">
+                            {group.properties.map((p) => (
+                              <div
+                                key={p._id}
+                                className="grid grid-cols-[1.3fr_0.7fr_0.7fr_0.7fr_0.7fr] gap-3 px-4 py-4 text-sm text-[#0b2f6a]"
+                              >
+                                <div className="min-w-0">
+                                  <div className="truncate font-semibold">
+                                    {p.title || "-"}
+                                  </div>
+                                  <div className="truncate text-xs text-[#6a7da5]">
+                                    {p.address || ""}
+                                  </div>
+                                </div>
+
+                                <div className="truncate text-[#5b6b86]">
+                                  {p.city || "-"}
+                                </div>
+
+                                <div className="font-semibold">
+                                  {(p.base_price || 0).toLocaleString("vi-VN")}{" "}
+                                  VND
+                                </div>
+
+                                <div>
+                                  <span className="inline-flex rounded-full border border-[#dbe7ff] bg-[#f6faff] px-3 py-1 text-xs font-semibold text-[#0b2f6a]">
+                                    {p.is_preferred ? "Có" : "Không"}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEdit(p)}
+                                    className="h-9 rounded-xl bg-[#006ce4] px-3 text-xs font-semibold text-white hover:bg-[#003b95]"
+                                  >
+                                    Sửa
+                                  </button>
+
+                                  <Link
+                                    to={`/properties/${p.city}/${p.slug}`}
+                                    className="flex h-9 items-center rounded-xl border border-[#dbe7ff] bg-white px-3 text-xs font-semibold text-[#0b2f6a] hover:bg-[#f6faff]"
+                                  >
+                                    Mở
+                                  </Link>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDelete(p._id)}
+                                    className="h-9 rounded-xl border border-[#ffd0d0] bg-[#fff5f5] px-3 text-xs font-semibold text-[#b42318] hover:bg-[#ffecec]"
+                                  >
+                                    Xóa
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </>
