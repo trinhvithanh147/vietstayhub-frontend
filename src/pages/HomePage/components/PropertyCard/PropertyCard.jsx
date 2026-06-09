@@ -20,7 +20,7 @@ import {
 } from "react-icons/md";
 import { DateRange } from "react-date-range";
 import { vi } from "date-fns/locale";
-
+import logo from "../../../../assets/images/logo.png";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import "swiper/css";
@@ -683,7 +683,7 @@ const PropertyCard = () => {
           <div className="header_top">
             <div className="top flex flex-wrap items-center justify-between gap-3 pb-2 pt-1">
               <Link to={path.homePage}>
-                <Icon.logoBrand className="h-[24px] w-[144px]" />
+                <img src={logo} className="w-[160px]" alt="" />
               </Link>
 
               <div className="flex max-w-full flex-wrap items-center justify-end gap-2">

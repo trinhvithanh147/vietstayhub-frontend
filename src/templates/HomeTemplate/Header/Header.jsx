@@ -17,7 +17,7 @@ import { roomService } from "../../../services/room.service";
 import { BookingService } from "../../../services/booking.service";
 import { userService } from "../../../services/users.service";
 import { conversationService } from "../../../services/conversation.service";
-
+import logo from "../../../assets/images/logo.png";
 const cityLabelMap = {
   "da-lat": "Đà Lạt",
   "da-nang": "Đà Nẵng",
@@ -492,7 +492,7 @@ const Header = () => {
           <div className="header_top">
             <div className="top flex flex-wrap items-center justify-between gap-3 pb-2 pt-1">
               <Link to={path.homePage}>
-                <Icon.logoBrand className="h-[24px] w-[144px]" />
+                <img src={logo} className="w-[160px]" alt="" />
               </Link>
 
               <div className="flex max-w-full flex-wrap items-center justify-end gap-2">

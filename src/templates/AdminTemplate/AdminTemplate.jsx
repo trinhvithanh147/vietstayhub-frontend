@@ -4,7 +4,7 @@ import { path } from "../../hooks/path";
 import Icon from "../../assets/Icon/Icon";
 import defaultAvatar from "../../assets/images/avatar-default.jpg";
 import { userService } from "../../services/users.service";
-
+import logo from "../../assets/images/logo.png";
 const getStoredUser = () => {
   try {
     return JSON.parse(localStorage.getItem("user") || "null");
@@ -77,7 +77,7 @@ const AdminTemplate = () => {
         <div className="container-custom flex flex-wrap items-center justify-between gap-3 py-3">
           <div className="flex items-center gap-3">
             <Link to={path.homePage} className="inline-flex items-center gap-2">
-              <Icon.logoBrand className="h-[22px] w-[132px]" />
+              <img src={logo} className="w-[160px]" alt="" />
             </Link>
             <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tracking-[0.06em]">
               ADMIN

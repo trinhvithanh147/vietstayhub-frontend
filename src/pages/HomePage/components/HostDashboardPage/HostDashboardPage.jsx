@@ -12,7 +12,7 @@ import { reviewService } from "../../../../services/review.service";
 import { roomService } from "../../../../services/room.service";
 import { userService } from "../../../../services/users.service";
 import { conversationService } from "../../../../services/conversation.service";
-
+import logo from "../../../../assets/images/logo.png";
 const moneyFormatter = new Intl.NumberFormat("vi-VN");
 const calculateCurrentPrice = (originalPrice, discountPercent) => {
   const safeOriginalPrice = Number(originalPrice) || 0;
@@ -922,109 +922,109 @@ const HostDashboardPage = () => {
         <div className="header container-custom">
           <div className="header_top">
             <div className="top flex flex-wrap items-center justify-between gap-3 pb-2 pt-1">
-            <Link to={path.homePage}>
-              <Icon.logoBrand className="h-[24px] w-[144px]" />
-            </Link>
+              <Link to={path.homePage}>
+                <img src={logo} className="w-[160px]" alt="" />
+              </Link>
 
-            <div className="flex max-w-full flex-wrap items-center justify-end gap-2">
-              <span className="hidden cursor-pointer px-3 py-2 font-medium hover:rounded-sm hover:bg-white/10 sm:inline-flex">
-                VND
-              </span>
-              <span className="hidden cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10 sm:inline-flex">
-                <img src={flatVN} alt="" className="h-6 w-6 rounded-full" />
-              </span>
-              <span className="hidden cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10 md:inline-flex">
-                <Icon.questionCircle className="w-5 fill-white" />
-              </span>
+              <div className="flex max-w-full flex-wrap items-center justify-end gap-2">
+                <span className="hidden cursor-pointer px-3 py-2 font-medium hover:rounded-sm hover:bg-white/10 sm:inline-flex">
+                  VND
+                </span>
+                <span className="hidden cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10 sm:inline-flex">
+                  <img src={flatVN} alt="" className="h-6 w-6 rounded-full" />
+                </span>
+                <span className="hidden cursor-pointer px-3 py-2 hover:rounded-sm hover:bg-white/10 md:inline-flex">
+                  <Icon.questionCircle className="w-5 fill-white" />
+                </span>
 
-              {user ? (
-                <>
-                  <Link
-                    to={path.hostDashboardPage}
-                    className="hidden px-3 py-2 text-[15px] font-medium hover:rounded-sm hover:bg-white/10 md:inline-flex lg:text-[16px]"
-                  >
-                    Quản lý chỗ nghỉ
-                  </Link>
-                  <Link
-                    to={path.message}
-                    className="relative px-3 py-2 text-[15px] font-medium hover:rounded-sm hover:bg-white/10 lg:text-[16px]"
-                  >
-                    Tin nhắn
-                    {messageCount > 0 && (
-                      <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
-                        {messageCount}
-                      </span>
-                    )}
-                  </Link>
-                  <div ref={avatarRef} className="relative z-[100] h-10 w-10">
-                    <button
-                      type="button"
-                      onClick={() => setAvatar(!avatar)}
-                      className="h-full w-full cursor-pointer rounded-full"
+                {user ? (
+                  <>
+                    <Link
+                      to={path.hostDashboardPage}
+                      className="hidden px-3 py-2 text-[15px] font-medium hover:rounded-sm hover:bg-white/10 md:inline-flex lg:text-[16px]"
                     >
-                      <img
-                        src={user.avatar?.url || defaultAvatar}
-                        alt=""
-                        className="h-full w-full rounded-full"
-                      />
-                    </button>
-                    {avatar && (
-                      <div
-                        onClick={(e) => e.stopPropagation()}
-                        className="absolute right-0 top-full z-[120] mt-3 w-[min(260px,calc(100vw-32px))] overflow-hidden rounded-[22px] border border-[#d9e2f1] bg-white text-[#1a1a1a] shadow-[0_22px_50px_rgba(0,0,0,0.18)] sm:left-1/2 sm:right-auto sm:-translate-x-1/2"
+                      Quản lý chỗ nghỉ
+                    </Link>
+                    <Link
+                      to={path.message}
+                      className="relative px-3 py-2 text-[15px] font-medium hover:rounded-sm hover:bg-white/10 lg:text-[16px]"
+                    >
+                      Tin nhắn
+                      {messageCount > 0 && (
+                        <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
+                          {messageCount}
+                        </span>
+                      )}
+                    </Link>
+                    <div ref={avatarRef} className="relative z-[100] h-10 w-10">
+                      <button
+                        type="button"
+                        onClick={() => setAvatar(!avatar)}
+                        className="h-full w-full cursor-pointer rounded-full"
                       >
-                        <div className="border-b border-[#eef3fb] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] p-4">
-                          <div className="flex items-center gap-3">
-                            <img
-                              src={user.avatar?.url || defaultAvatar}
-                              alt=""
-                              className="h-12 w-12 rounded-full border border-[#d9e2f1]"
-                            />
-                            <div className="min-w-0">
-                              <span className="block truncate text-[15px] font-semibold text-[#10357b]">
-                                {user.full_name}
-                              </span>
-                              <span className="block truncate text-[13px] text-[#6b7a99]">
-                                {user.email}
-                              </span>
+                        <img
+                          src={user.avatar?.url || defaultAvatar}
+                          alt=""
+                          className="h-full w-full rounded-full"
+                        />
+                      </button>
+                      {avatar && (
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="absolute right-0 top-full z-[120] mt-3 w-[min(260px,calc(100vw-32px))] overflow-hidden rounded-[22px] border border-[#d9e2f1] bg-white text-[#1a1a1a] shadow-[0_22px_50px_rgba(0,0,0,0.18)] sm:left-1/2 sm:right-auto sm:-translate-x-1/2"
+                        >
+                          <div className="border-b border-[#eef3fb] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] p-4">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={user.avatar?.url || defaultAvatar}
+                                alt=""
+                                className="h-12 w-12 rounded-full border border-[#d9e2f1]"
+                              />
+                              <div className="min-w-0">
+                                <span className="block truncate text-[15px] font-semibold text-[#10357b]">
+                                  {user.full_name}
+                                </span>
+                                <span className="block truncate text-[13px] text-[#6b7a99]">
+                                  {user.email}
+                                </span>
+                              </div>
                             </div>
                           </div>
+                          <div className="space-y-2 p-3">
+                            <Link
+                              to={path.profile}
+                              className="flex w-full items-center justify-between rounded-xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3 text-sm font-semibold text-[#003b95] transition hover:border-[#bfd3f6] hover:bg-[#eef5ff]"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span>Hồ sơ cá nhân</span>
+                              </div>
+                            </Link>
+                            <button
+                              onClick={handleLogOut}
+                              className="w-full cursor-pointer rounded-xl bg-primary-2 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary"
+                            >
+                              Đăng xuất
+                            </button>
+                          </div>
                         </div>
-                        <div className="space-y-2 p-3">
-                          <Link
-                            to={path.profile}
-                            className="flex w-full items-center justify-between rounded-xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3 text-sm font-semibold text-[#003b95] transition hover:border-[#bfd3f6] hover:bg-[#eef5ff]"
-                          >
-                            <div className="flex items-center justify-between">
-                              <span>Hồ sơ cá nhân</span>
-                            </div>
-                          </Link>
-                          <button
-                            onClick={handleLogOut}
-                            className="w-full cursor-pointer rounded-xl bg-primary-2 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary"
-                          >
-                            Đăng xuất
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <Link to={path.register}>
-                    <ButtonCustom className="bg-white px-3 py-1 font-medium text-[#006ce4] hover:bg-primary-2 hover:opacity-90">
-                      Đăng ký
-                    </ButtonCustom>
-                  </Link>
-                  <Link to={path.login}>
-                    <ButtonCustom className="bg-white px-3 py-1 font-medium text-[#006ce4] hover:bg-primary-2 hover:opacity-90">
-                      Đăng nhập
-                    </ButtonCustom>
-                  </Link>
-                </>
-              )}
-            </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Link to={path.register}>
+                      <ButtonCustom className="bg-white px-3 py-1 font-medium text-[#006ce4] hover:bg-primary-2 hover:opacity-90">
+                        Đăng ký
+                      </ButtonCustom>
+                    </Link>
+                    <Link to={path.login}>
+                      <ButtonCustom className="bg-white px-3 py-1 font-medium text-[#006ce4] hover:bg-primary-2 hover:opacity-90">
+                        Đăng nhập
+                      </ButtonCustom>
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>

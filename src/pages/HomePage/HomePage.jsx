@@ -2,6 +2,8 @@ import HomeIntroShowcase from "./components/HomeIntroShowcase/HomeIntroShowcase"
 import TrendingDestinationsPage from "./components/TrendingDestinations/TrendingDestinationsPage";
 import GuestFavoritesShowcase from "./components/GuestFavoritesPage/GuestFavoritesShowcase";
 import IdealStayShowcase from "./components/IdealStayPage/IdealStayShowcase";
+import { Link } from "react-router-dom";
+import { path } from "../../hooks/path";
 
 const HomePage = () => {
   return (
@@ -32,9 +34,12 @@ const HomePage = () => {
               dashboard trực quan, phù hợp để mở rộng thành đồ án hoàn chỉnh.
             </p>
 
-            <button className="mt-6 rounded-2xl bg-white px-6 py-3 text-[15px] font-bold text-[#003b95] transition hover:bg-[#eef5ff]">
+            <Link
+              to={path.hostDashboardPage}
+              className="mt-6 rounded-2xl bg-white px-6 py-3 text-[15px] font-bold text-[#003b95] transition hover:bg-[#eef5ff] block w-60"
+            >
               Bắt đầu quản lý chỗ nghỉ
-            </button>
+            </Link>
           </div>
 
           <div className="absolute -right-20 -top-20 hidden h-[260px] w-[260px] rounded-full bg-white/10 lg:block" />

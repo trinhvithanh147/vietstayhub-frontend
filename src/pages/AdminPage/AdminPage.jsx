@@ -10,11 +10,11 @@ const AdminPage = () => {
 
   const tabs = useMemo(
     () => [
-      { id: "users", label: "Users" },
-      { id: "properties", label: "Properties" },
-      { id: "rooms", label: "Rooms" },
-      { id: "bookings", label: "Bookings" },
-      { id: "reviews", label: "Reviews" },
+      { id: "users", label: "Người dùng" },
+      { id: "properties", label: "Lưu trú" },
+      { id: "rooms", label: "Phòng" },
+      { id: "bookings", label: "Đặt phòng" },
+      { id: "reviews", label: "Đánh giá" },
     ],
     [],
   );

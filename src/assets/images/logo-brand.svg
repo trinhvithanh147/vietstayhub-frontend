@@ -1,0 +1,40 @@
+<svg width="780" height="170" viewBox="0 0 780 170" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">VietStayHub logo</title>
+  <desc id="desc">Transparent VietStayHub logo for website header</desc>
+  <defs>
+    <linearGradient id="blue" x1="20" y1="20" x2="130" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0077E6"/>
+      <stop offset="1" stop-color="#003B95"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="20" y1="105" x2="135" y2="105" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#03A9F4"/>
+      <stop offset="1" stop-color="#006CE4"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="55" y1="37" x2="95" y2="85" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC83D"/>
+      <stop offset="1" stop-color="#F5A400"/>
+    </linearGradient>
+  </defs>
+
+  <!-- icon -->
+  <g transform="translate(8 8)">
+    <path d="M31 76C22 45 46 16 78 16c33 0 56 30 47 61" stroke="url(#blue)" stroke-width="13" stroke-linecap="round"/>
+    <circle cx="78" cy="64" r="31" fill="url(#sun)"/>
+    <path d="M24 101C43 91 58 78 78 55C98 78 113 91 132 101" stroke="#003B95" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M34 98H122L112 109C94 127 63 127 44 109L34 98Z" fill="white"/>
+    <path d="M22 111C50 100 99 100 135 111C103 122 60 125 22 111Z" fill="url(#wave)"/>
+    <path d="M35 122C58 136 97 137 120 122L78 154L35 122Z" fill="url(#blue)"/>
+    <rect x="66" y="82" width="10" height="10" fill="#003B95"/>
+    <rect x="81" y="82" width="10" height="10" fill="#003B95"/>
+    <rect x="66" y="97" width="10" height="10" fill="#003B95"/>
+    <rect x="81" y="97" width="10" height="10" fill="#003B95"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="178" y="105" font-family="Inter, Arial, Helvetica, sans-serif" font-size="78" font-weight="800" letter-spacing="-3" fill="#003B95">VietStay</text>
+  <text x="515" y="105" font-family="Inter, Arial, Helvetica, sans-serif" font-size="78" font-weight="800" letter-spacing="-3" fill="#F5A400">Hub</text>
+
+  <!-- travel swoosh and airplane -->
+  <path d="M470 45C540 11 626 16 676 33" stroke="#006CE4" stroke-width="5" stroke-linecap="round"/>
+  <path d="M685 22L727 42L688 56L693 43L666 32L694 35L685 22Z" fill="#003B95"/>
+</svg>
