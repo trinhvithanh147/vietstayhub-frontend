@@ -375,7 +375,7 @@ const ManageProperty = () => {
             step="any"
             value={form.location_lat}
             onChange={handleChange}
-            placeholder="Vĩ độ - Latitude"
+            placeholder="Vĩ độ"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
 
@@ -385,7 +385,7 @@ const ManageProperty = () => {
             step="any"
             value={form.location_lng}
             onChange={handleChange}
-            placeholder="Kinh độ - Longitude"
+            placeholder="Kinh độ"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
           />
           <input
