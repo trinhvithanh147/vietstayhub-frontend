@@ -1,15 +1,20 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ManageUser from "./components/ManageUser";
 import ManageProperty from "./components/ManageProperty";
 import ManageRoom from "./components/ManageRoom";
 import ManageReview from "./components/ManageReview";
 import ManageBooking from "./components/ManageBooking";
+import AdminStatisticsCharts from "./components/AdminStatisticsCharts";
+import { statisticService } from "../../services/statistic.service";
 
 const AdminPage = () => {
-  const [tab, setTab] = useState("users");
+  const [tab, setTab] = useState("statistics");
+  const [statistics, setStatistics] = useState(null);
+  const [statisticsError, setStatisticsError] = useState("");
 
   const tabs = useMemo(
     () => [
+      { id: "statistics", label: "Thống kê" },
       { id: "users", label: "Người dùng" },
       { id: "properties", label: "Lưu trú" },
       { id: "rooms", label: "Phòng" },
@@ -18,6 +23,18 @@ const AdminPage = () => {
     ],
     [],
   );
+
+  useEffect(() => {
+    statisticService
+      .getAdminStatistics()
+      .then((res) => {
+        setStatistics(res.data.metaData);
+      })
+      .catch((err) => {
+        console.log(err);
+        setStatisticsError("Không tải được dữ liệu thống kê");
+      });
+  }, []);
 
   return (
     <div className="space-y-5 sm:space-y-6">
@@ -31,7 +48,7 @@ const AdminPage = () => {
               Quản lý hệ thống
             </h1>
             <p className="mt-2 max-w-[720px] text-sm leading-7 text-[#5b6b86]">
-              Xem nhanh danh sách dữ liệu và thao tác CRUD.
+              Xem nhanh thống kê dữ liệu và thao tác CRUD.
             </p>
           </div>
 
@@ -53,6 +70,24 @@ const AdminPage = () => {
           </div>
         </div>
       </div>
+
+      {tab === "statistics" && (
+        <>
+          {statisticsError && (
+            <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-600">
+              {statisticsError}
+            </div>
+          )}
+
+          {!statistics && !statisticsError && (
+            <div className="rounded-2xl border border-[#dbe7ff] bg-white p-5 text-sm text-[#5b6b86]">
+              Đang tải thống kê...
+            </div>
+          )}
+
+          {statistics && <AdminStatisticsCharts charts={statistics.charts} />}
+        </>
+      )}
 
       {tab === "users" && <ManageUser />}
       {tab === "properties" && <ManageProperty />}
