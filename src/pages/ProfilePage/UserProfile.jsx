@@ -6,7 +6,7 @@ import defaultAvatar from "../../assets/images/avatar-default.jpg";
 import { path } from "../../hooks/path";
 import { userService } from "../../services/users.service";
 import { validateProfile } from "../../utils/validate";
-
+import logo from "../../assets/images/logo.png";
 const getUserIdFromToken = () => {
   try {
     const accessToken = localStorage.getItem("accessToken");
@@ -251,7 +251,7 @@ const UserProfile = () => {
         <div className="container-custom">
           <div className="flex items-center justify-between pb-3 pt-2">
             <Link to={path.homePage}>
-              <Icon.logoBrand className="h-[24px] w-[144px]" />
+              <img src={logo} className="w-[160px]" alt="" />
             </Link>
 
             <div className="flex items-center gap-2">

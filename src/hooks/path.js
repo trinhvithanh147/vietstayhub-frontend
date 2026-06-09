@@ -8,6 +8,6 @@ export const path = {
   city: "/:city",
   hostDashboardPage: "/host-dashboard",
   forgotpassword: "/forgot-password",
-  profile: "/profile",
+  profile: "/thong-tin-ca-nhan",
   message: "/message",
 };
