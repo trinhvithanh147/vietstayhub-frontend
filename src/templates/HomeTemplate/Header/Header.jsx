@@ -1,7 +1,7 @@
 ﻿import { Link, useNavigate } from "react-router-dom";
 import Icon from "../../../assets/Icon/Icon";
 import ButtonCustom from "../../../components/ButtonCustom/ButtonCustom";
-
+import { CalendarCheck, UserRound } from "lucide-react";
 import flatVN from "../../../assets/images/Vn@3x.png";
 import defaultAvatar from "../../../assets/images/avatar-default.jpg";
 import { DateRange } from "react-date-range";
@@ -566,8 +566,9 @@ const Header = () => {
                           <div className="space-y-2 p-3">
                             <Link
                               to={path.profile}
-                              className="flex w-full items-center justify-between rounded-xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3 text-sm font-semibold text-[#003b95] transition hover:border-[#bfd3f6] hover:bg-[#eef5ff]"
+                              className="flex w-full items-center gap-2 rounded-xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3 text-sm font-semibold text-[#003b95] transition hover:border-[#bfd3f6] hover:bg-[#eef5ff]"
                             >
+                              <UserRound className="w-4" />
                               Hồ sơ cá nhân
                             </Link>
 

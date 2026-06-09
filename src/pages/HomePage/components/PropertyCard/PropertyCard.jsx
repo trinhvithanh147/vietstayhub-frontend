@@ -755,11 +755,10 @@ const PropertyCard = () => {
                           <div className="space-y-2 p-3">
                             <Link
                               to={path.profile}
-                              className="block w-full cursor-pointer rounded-xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3 text-sm font-semibold text-[#003b95] transition hover:border-[#bfd3f6] hover:bg-[#eef5ff]"
+                              className="flex w-full items-center gap-2 rounded-xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3 text-sm font-semibold text-[#003b95] transition hover:border-[#bfd3f6] hover:bg-[#eef5ff]"
                             >
-                              <div className="flex items-center justify-between">
-                                <span>Hồ sơ cá nhân</span>
-                              </div>
+                              <UserRound className="w-4" />
+                              Hồ sơ cá nhân
                             </Link>
 
                             <button

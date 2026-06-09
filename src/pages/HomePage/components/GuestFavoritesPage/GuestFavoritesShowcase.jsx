@@ -8,18 +8,29 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./guestFavoritesSwiper.scss";
-
-const formatPriceVn = (price) =>
-  new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-    maximumFractionDigits: 0,
-  }).format(price || 0);
+import { roomService } from "../../../../services/room.service";
 
 const GuestFavoritesShowcase = () => {
   const [properties, setProperties] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [rooms, setRooms] = useState([]);
+  const formatPriceVn = (price) => {
+    const numberPrice = Number(price || 0);
 
+    if (!numberPrice) return "Đang cập nhật";
+
+    return `${numberPrice.toLocaleString("vi-VN")} VND`;
+  };
+  useEffect(() => {
+    roomService
+      .getAll()
+      .then((res) => {
+        setRooms(res.data.metaData || []);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
   useEffect(() => {
     proPertiesService
       .getAll()
@@ -51,13 +62,27 @@ const GuestFavoritesShowcase = () => {
               ? item.property_id?._id
               : item.property_id;
 
-          return propertyId === property._id;
+          return String(propertyId) === String(property._id);
         });
 
+        const propertyRooms = rooms.filter((room) => {
+          const propertyId =
+            typeof room.property_id === "object"
+              ? room.property_id?._id
+              : room.property_id;
+
+          return String(propertyId) === String(property._id);
+        });
+
+        const standardRoom =
+          propertyRooms.find((room) => room.room_type === "standard_room") ||
+          propertyRooms[0];
+
         const totalRating = currentReviews.reduce(
-          (sum, item) => sum + item.rating,
+          (sum, item) => sum + Number(item.rating || 0),
           0,
         );
+
         const averageRating = currentReviews.length
           ? Number((totalRating / currentReviews.length).toFixed(1))
           : 0;
@@ -66,12 +91,25 @@ const GuestFavoritesShowcase = () => {
           ...property,
           averageRating,
           reviewCount: currentReviews.length,
+          currentPrice: standardRoom?.price || 0,
+          originalPrice: standardRoom?.original_price || 0,
+          discountPercent: standardRoom?.discount_percent || 0,
         };
       })
-      .filter((item) => item.averageRating >= 7 || item.is_preferred)
-      .sort((a, b) => b.averageRating - a.averageRating)
+      .filter((item) => item.reviewCount > 0 || item.is_preferred)
+      .sort((a, b) => {
+        if (b.is_preferred !== a.is_preferred) {
+          return Number(b.is_preferred) - Number(a.is_preferred);
+        }
+
+        if (b.averageRating !== a.averageRating) {
+          return b.averageRating - a.averageRating;
+        }
+
+        return b.reviewCount - a.reviewCount;
+      })
       .slice(0, 10);
-  }, [properties, reviews]);
+  }, [properties, reviews, rooms]);
 
   return (
     <section className="container-custom mt-10 rounded-[24px] border border-[#dbe7ff] bg-[linear-gradient(180deg,rgba(0,59,149,0.06)_0%,rgba(255,255,255,1)_100%)] px-5 py-7 text-[#1a1a1a] sm:mt-14 sm:rounded-[32px] md:px-8 md:py-8 lg:rounded-[36px]">
@@ -167,9 +205,23 @@ const GuestFavoritesShowcase = () => {
                 <div className="mt-auto flex flex-col gap-3 border-t border-[#e8eef8] pt-4 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
                   <div>
                     <span className="block text-sm text-[#64748b]">Giá từ</span>
+
                     <span className="mt-1 block text-xl font-bold text-primary">
-                      {formatPriceVn(item.base_price)}
+                      {formatPriceVn(item.currentPrice)}
                     </span>
+
+                    {item.discountPercent > 0 &&
+                      item.originalPrice > item.currentPrice && (
+                        <div className="mt-1 flex items-center gap-2">
+                          <span className="text-sm text-[#94a3b8] line-through">
+                            {formatPriceVn(item.originalPrice)}
+                          </span>
+
+                          <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600">
+                            -{item.discountPercent}%
+                          </span>
+                        </div>
+                      )}
                   </div>
                   <span className="rounded-2xl bg-primary-2 px-4 py-2 text-sm font-semibold text-white transition group-hover:bg-primary">
                     Xem chi tiết

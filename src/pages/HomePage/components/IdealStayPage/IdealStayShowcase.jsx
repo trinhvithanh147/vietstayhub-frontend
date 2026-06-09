@@ -1,19 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Navigation, Pagination } from "swiper/modules";
+import { Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import proPertiesService from "../../../../services/properties.service";
+import { roomService } from "../../../../services/room.service";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./idealStaySwiper.scss";
-
-const formatPriceVn = (price) =>
-  new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-    maximumFractionDigits: 0,
-  }).format(price || 0);
 
 const amenityLabels = {
   outdoor_pool: "Hồ bơi ngoài trời",
@@ -28,20 +22,82 @@ const amenityLabels = {
   breakfast: "Bữa sáng",
 };
 
+const formatPriceVn = (price) => {
+  const numberPrice = Number(price || 0);
+
+  if (!numberPrice) return "Đang cập nhật";
+
+  return `${numberPrice.toLocaleString("vi-VN")} VND`;
+};
+
+const getPropertyId = (propertyId) => {
+  if (!propertyId) return "";
+
+  return typeof propertyId === "object" ? propertyId?._id : propertyId;
+};
+
+const getRepresentativeRoom = (propertyRooms) => {
+  if (!propertyRooms.length) return null;
+
+  return (
+    propertyRooms.find((room) => room.room_type === "standard_room") ||
+    propertyRooms[0]
+  );
+};
+
 const IdealStayShowcase = () => {
   const [properties, setProperties] = useState([]);
-  const visibleProperties = properties.slice(0, 10);
+  const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
-    proPertiesService
-      .getAll()
-      .then((res) => {
-        setProperties(res.data.metaData || []);
+    Promise.all([proPertiesService.getAll(), roomService.getAll()])
+      .then(([propertyRes, roomRes]) => {
+        setProperties(propertyRes.data.metaData || []);
+        setRooms(roomRes.data.metaData || []);
       })
       .catch((err) => {
         console.log(err);
       });
   }, []);
+
+  const visibleProperties = useMemo(() => {
+    return properties
+      .map((property) => {
+        const propertyRooms = rooms.filter((room) => {
+          return (
+            String(getPropertyId(room.property_id)) === String(property._id)
+          );
+        });
+
+        const representativeRoom = getRepresentativeRoom(propertyRooms);
+
+        const amenityCount = Object.values(property.amenities || {}).filter(
+          Boolean,
+        ).length;
+
+        return {
+          ...property,
+          currentPrice: representativeRoom?.price || 0,
+          originalPrice: representativeRoom?.original_price || 0,
+          discountPercent: representativeRoom?.discount_percent || 0,
+          amenityCount,
+          hasRoom: propertyRooms.length > 0,
+        };
+      })
+      .filter((item) => item.hasRoom && item.currentPrice > 0)
+      .sort((a, b) => {
+        if (b.discountPercent !== a.discountPercent) {
+          return b.discountPercent - a.discountPercent;
+        }
+
+        if (b.amenityCount !== a.amenityCount) {
+          return b.amenityCount - a.amenityCount;
+        }
+
+        return a.currentPrice - b.currentPrice;
+      })
+      .slice(0, 10);
+  }, [properties, rooms]);
 
   return (
     <section className="container-custom mt-10 rounded-[24px] border border-[#dbe7ff] bg-white px-5 py-7 text-[#1a1a1a] shadow-[0_14px_40px_rgba(0,59,149,0.06)] sm:mt-14 sm:rounded-[32px] md:px-8 md:py-8 lg:rounded-[36px]">
@@ -89,6 +145,7 @@ const IdealStayShowcase = () => {
                   alt={item.title}
                   className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
                 />
+
                 <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-primary">
                   {item.city}
                 </div>
@@ -124,11 +181,28 @@ const IdealStayShowcase = () => {
 
                 <div className="mt-auto flex flex-col gap-3 border-t border-[#e8eef8] pt-4 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
                   <div>
-                    <span className="block text-sm text-[#64748b]">Giá từ</span>
-                    <span className="mt-1 block text-xl font-bold text-primary">
-                      {formatPriceVn(item.base_price)}
+                    <span className="block text-sm text-[#64748b]">
+                      Ưu đãi từ
                     </span>
+
+                    <span className="mt-1 block text-xl font-bold text-primary">
+                      {formatPriceVn(item.currentPrice)}
+                    </span>
+
+                    {item.discountPercent > 0 &&
+                      item.originalPrice > item.currentPrice && (
+                        <div className="mt-1 flex items-center gap-2">
+                          <span className="text-sm text-[#94a3b8] line-through">
+                            {formatPriceVn(item.originalPrice)}
+                          </span>
+
+                          <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600">
+                            -{item.discountPercent}%
+                          </span>
+                        </div>
+                      )}
                   </div>
+
                   <span className="rounded-2xl border border-primary-2 px-4 py-2 text-sm font-semibold text-primary-2 transition group-hover:bg-primary-2 group-hover:text-white">
                     Khám phá ngay
                   </span>

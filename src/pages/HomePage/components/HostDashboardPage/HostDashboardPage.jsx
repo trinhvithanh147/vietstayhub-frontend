@@ -13,6 +13,7 @@ import { roomService } from "../../../../services/room.service";
 import { userService } from "../../../../services/users.service";
 import { conversationService } from "../../../../services/conversation.service";
 import logo from "../../../../assets/images/logo.png";
+import { UserRound } from "lucide-react";
 const moneyFormatter = new Intl.NumberFormat("vi-VN");
 const calculateCurrentPrice = (originalPrice, discountPercent) => {
   const safeOriginalPrice = Number(originalPrice) || 0;
@@ -993,11 +994,10 @@ const HostDashboardPage = () => {
                           <div className="space-y-2 p-3">
                             <Link
                               to={path.profile}
-                              className="flex w-full items-center justify-between rounded-xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3 text-sm font-semibold text-[#003b95] transition hover:border-[#bfd3f6] hover:bg-[#eef5ff]"
+                              className="flex w-full items-center gap-2 rounded-xl border border-[#dbe7ff] bg-[#f8fbff] px-4 py-3 text-sm font-semibold text-[#003b95] transition hover:border-[#bfd3f6] hover:bg-[#eef5ff]"
                             >
-                              <div className="flex items-center justify-between">
-                                <span>Hồ sơ cá nhân</span>
-                              </div>
+                              <UserRound className="w-4" />
+                              Hồ sơ cá nhân
                             </Link>
                             <button
                               onClick={handleLogOut}

@@ -23,9 +23,8 @@ const createInitialForm = () => ({
   city: "da-lat",
   location_lat: "",
   location_lng: "",
-  country: "Viet Nam",
+
   type: "hotel",
-  base_price: "",
   description: "",
   main_image_url: "",
   main_image_public_id: "",
@@ -45,9 +44,9 @@ const buildFormFromProperty = (property) => ({
   city: property.city || "da-lat",
   location_lat: property.location?.lat ?? "",
   location_lng: property.location?.lng ?? "",
-  country: property.country || "Viet Nam",
+
   type: property.type || "hotel",
-  base_price: String(property.base_price ?? ""),
+
   description: property.description || "",
   main_image_url: property.main_image_url || "",
   main_image_public_id: property.main_image_public_id || "",
@@ -227,9 +226,9 @@ const ManageProperty = () => {
         lat: form.location_lat === "" ? null : Number(form.location_lat),
         lng: form.location_lng === "" ? null : Number(form.location_lng),
       },
-      country: form.country.trim(),
+
       type: "hotel",
-      base_price: Number(form.base_price) || 0,
+
       description: form.description.trim(),
       amenities: form.amenities,
       main_image_url: form.main_image_url.trim(),
@@ -387,21 +386,6 @@ const ManageProperty = () => {
             onChange={handleChange}
             placeholder="Kinh độ"
             className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
-          />
-          <input
-            name="country"
-            value={form.country}
-            onChange={handleChange}
-            placeholder="Quốc gia"
-            className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4]"
-          />
-
-          <input
-            name="base_price"
-            value={form.base_price}
-            onChange={handleChange}
-            placeholder="Giá cơ bản"
-            className="h-12 rounded-2xl border border-[#dbe7ff] bg-white px-4 outline-none focus:border-[#006ce4] xl:col-span-2"
           />
 
           <select
@@ -592,22 +576,13 @@ const ManageProperty = () => {
                             <div className="mt-1 break-words text-xs text-[#6a7da5]">
                               {p.address || ""}
                             </div>
-                            <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
+                            <div className="mt-3 grid grid-cols-1 gap-3 text-xs">
                               <div>
                                 <span className="block font-semibold text-[#6a7da5]">
                                   Thành phố
                                 </span>
                                 <span className="mt-1 block">
                                   {p.city || "-"}
-                                </span>
-                              </div>
-                              <div>
-                                <span className="block font-semibold text-[#6a7da5]">
-                                  Giá
-                                </span>
-                                <span className="mt-1 block">
-                                  {(p.base_price || 0).toLocaleString("vi-VN")}{" "}
-                                  VND
                                 </span>
                               </div>
                             </div>
