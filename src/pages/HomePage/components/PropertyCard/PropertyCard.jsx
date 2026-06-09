@@ -41,6 +41,7 @@ import Footer from "../../../../templates/HomeTemplate/Footer/Footer";
 import { conversationService } from "../../../../services/conversation.service";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
+import { UserRound } from "lucide-react";
 const getToday = () => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
