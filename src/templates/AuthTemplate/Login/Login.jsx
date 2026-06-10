@@ -4,7 +4,7 @@ import Icon from "../../../assets/Icon/Icon";
 import flatVN from "../../../assets/images/Vn@3x.png";
 import { userService } from "../../../services/users.service";
 import { path } from "../../../hooks/path";
-
+import logo from "../../../assets/images/logo.png";
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const Login = () => {
@@ -88,7 +88,7 @@ const Login = () => {
         <div className="container-custom">
           <div className="flex items-center justify-between pb-3 pt-2">
             <Link to={path.homePage}>
-              <Icon.logoBrand className="h-[24px] w-[144px]" />
+              <img src={logo} className="w-[160px]" alt="" />
             </Link>
 
             <div className="flex items-center gap-2">
