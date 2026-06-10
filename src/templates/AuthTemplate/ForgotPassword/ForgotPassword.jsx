@@ -4,7 +4,7 @@ import Icon from "../../../assets/Icon/Icon";
 import flatVN from "../../../assets/images/Vn@3x.png";
 import { path } from "../../../hooks/path";
 import { userService } from "../../../services/users.service";
-
+import logo from "../../../assets/images/logo.png";
 const STEP_SEND_EMAIL = 1;
 const STEP_VERIFY_CODE = 2;
 const STEP_RESET_PASSWORD = 3;
@@ -128,7 +128,9 @@ const ForgotPassword = () => {
         newPassword: form.newPassword,
       });
 
-      setSuccessMessage("Đổi mật khẩu thành công. Đang chuyển về trang đăng nhập...");
+      setSuccessMessage(
+        "Đổi mật khẩu thành công. Đang chuyển về trang đăng nhập...",
+      );
 
       setTimeout(() => {
         navigate(path.login);
@@ -165,11 +167,14 @@ const ForgotPassword = () => {
             </label>
             <input
               value={form.code}
-              onChange={(e) => handleFieldChange("code", e.target.value)}
+              onChange={(e) =>
+                handleFieldChange("code", e.target.value.replace(/\D/g, ""))
+              }
               type="text"
+              inputMode="numeric"
               maxLength={6}
               placeholder="Nhập mã gồm 6 số"
-              className="h-13 w-full rounded-2xl border border-[#c9d8ef] bg-[#fbfdff] px-4 tracking-[0.3em] outline-none transition focus:border-[#006ce4] focus:bg-white"
+              className="h-[52px] w-full rounded-2xl border border-[#c9d8ef] bg-[#fbfdff] px-4 tracking-[0.3em] outline-none transition focus:border-[#006ce4] focus:bg-white"
             />
           </div>
 
@@ -271,7 +276,7 @@ const ForgotPassword = () => {
         <div className="container-custom">
           <div className="flex items-center justify-between pb-3 pt-2">
             <Link to={path.homePage}>
-              <Icon.logoBrand className="h-[24px] w-[144px]" />
+              <img src={logo} className="w-[160px]" alt="" />
             </Link>
 
             <div className="flex items-center gap-2">
@@ -334,8 +339,8 @@ const ForgotPassword = () => {
                   Mã xác thực có hiệu lực trong 10 phút
                 </span>
                 <span className="mt-2 block text-sm leading-7 text-white/82">
-                  Nếu không thấy email, bạn hãy kiểm tra thêm mục thư rác hoặc gửi
-                  lại mã xác thực ở bước tiếp theo.
+                  Nếu không thấy email, bạn hãy kiểm tra thêm mục thư rác hoặc
+                  gửi lại mã xác thực ở bước tiếp theo.
                 </span>
               </div>
             </div>
@@ -348,7 +353,7 @@ const ForgotPassword = () => {
 
             <p className="mt-3 text-[15px] leading-7 text-secondary-2">
               {step === STEP_SEND_EMAIL &&
-                "Bắt đầu bằng email đã đăng ký để nhận mã xác thực qua Gmail."}
+                "Bắt đầu bằng email đã đăng ký để nhận mã xác thực."}
               {step === STEP_VERIFY_CODE &&
                 "Nhập đúng mã gồm 6 số đã được gửi về email của bạn."}
               {step === STEP_RESET_PASSWORD &&

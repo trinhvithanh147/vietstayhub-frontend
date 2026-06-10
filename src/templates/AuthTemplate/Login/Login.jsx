@@ -30,7 +30,8 @@ const Login = () => {
   };
 
   const handleLogin = async () => {
-    const emailValue = emailInputRef.current?.value?.trim() || form.email.trim();
+    const emailValue =
+      emailInputRef.current?.value?.trim() || form.email.trim();
     const passwordValue = passwordInputRef.current?.value || form.password;
 
     setForm({
@@ -56,7 +57,9 @@ const Login = () => {
       localStorage.setItem("user", JSON.stringify(res.data.metaData.user));
 
       const nextPath =
-        res.data.metaData.user?.role === "admin" ? path.adminPage : path.homePage;
+        res.data.metaData.user?.role === "admin"
+          ? path.adminPage
+          : path.homePage;
 
       setTimeout(() => {
         navigate(nextPath);
@@ -64,7 +67,8 @@ const Login = () => {
     } catch (err) {
       console.log(err);
       setErrorMessage(
-        err?.response?.data?.message || "Đăng nhập thất bại, kiểm tra lại thông tin.",
+        err?.response?.data?.message ||
+          "Đăng nhập thất bại, kiểm tra lại thông tin.",
       );
     } finally {
       setIsSubmitting(false);
@@ -104,15 +108,16 @@ const Login = () => {
           <div className="overflow-hidden rounded-[36px] border border-white/10 bg-[linear-gradient(155deg,#4f83d8_0%,#245fbe_38%,#0b3f97_100%)] p-8 text-white shadow-[0_24px_70px_rgba(0,59,149,0.28)]">
             <div className="max-w-[520px]">
               <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold tracking-[0.02em] text-white">
-                Booking.com account
+                Tài khoản VietStayHub
               </span>
 
               <h1 className="mt-6 text-[42px] font-bold leading-[1.12] text-white">
-                Đăng nhập để quản lý booking và khám phá ưu đãi tốt hơn
+                Đăng nhập để quản lý lịch đặt phòng và khám phá ưu đãi tốt hơn
               </h1>
 
               <p className="mt-5 max-w-[500px] text-[18px] leading-8 text-white/88">
-                Theo dõi đơn đặt phòng, lưu chỗ nghỉ yêu thích và tiếp tục hành trình của bạn trên cùng một tài khoản.
+                Theo dõi đơn đặt phòng, lưu chỗ nghỉ yêu thích và tiếp tục hành
+                trình của bạn trên cùng một tài khoản.
               </p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -133,23 +138,34 @@ const Login = () => {
 
               <div className="mt-8 flex flex-wrap gap-4">
                 <div className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.08)] px-5 py-4">
-                  <span className="block text-[28px] font-bold text-white">24/7</span>
-                  <span className="text-sm text-white/80">Hỗ trợ hành trình</span>
+                  <span className="block text-[28px] font-bold text-white">
+                    24/7
+                  </span>
+                  <span className="text-sm text-white/80">
+                    Hỗ trợ hành trình
+                  </span>
                 </div>
 
                 <div className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.08)] px-5 py-4">
-                  <span className="block text-[28px] font-bold text-white">1 tài khoản</span>
-                  <span className="text-sm text-white/80">Tất cả booking và chỗ nghỉ</span>
+                  <span className="block text-[28px] font-bold text-white">
+                    1 tài khoản
+                  </span>
+                  <span className="text-sm text-white/80">
+                    "Tất cả lịch đặt và chỗ nghỉ"
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="rounded-[36px] border border-[#dbe7ff] bg-white/95 p-8 shadow-[0_22px_60px_rgba(0,59,149,0.12)] backdrop-blur">
-            <span className="text-[34px] font-bold text-primary">Đăng nhập</span>
+            <span className="text-[34px] font-bold text-primary">
+              Đăng nhập
+            </span>
 
             <p className="mt-3 text-[15px] leading-7 text-secondary-2">
-              Đăng nhập tài khoản Booking.com của bạn để truy cập các dịch vụ và quản lý hành trình một cách gọn gàng hơn.
+              Đăng nhập tài khoản VietStayHub của bạn để theo dõi lịch đặt
+              phòng, lưu chỗ nghỉ yêu thích và quản lý hành trình dễ dàng hơn.
             </p>
 
             <div className="mt-8 space-y-5">
@@ -226,7 +242,8 @@ const Login = () => {
             </button>
 
             <div className="mt-6 rounded-2xl bg-[#f8fbff] p-4 text-sm leading-7 text-secondary-2">
-              Đăng nhập đồng nghĩa với việc bạn chấp nhận các điều khoản và chính sách bảo mật của Booking.com.
+              Đăng nhập đồng nghĩa với việc bạn chấp nhận các điều khoản và
+              chính sách bảo mật của VietStayHub.
             </div>
 
             <div className="mt-6 text-center text-sm text-secondary-2">

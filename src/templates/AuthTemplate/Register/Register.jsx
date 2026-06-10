@@ -5,7 +5,7 @@ import flatVN from "../../../assets/images/Vn@3x.png";
 import { userService } from "../../../services/users.service";
 import { path } from "../../../hooks/path";
 import { validateRegister } from "../../../utils/validate";
-
+import logo from "../../../assets/images/logo.png";
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const Register = () => {
@@ -58,7 +58,7 @@ const Register = () => {
         <div className="container-custom">
           <div className="flex items-center justify-between pb-3 pt-2">
             <Link to={path.homePage}>
-              <Icon.logoBrand className="h-[24px] w-[144px]" />
+              <img src={logo} alt="" className="w-[160px]" />
             </Link>
 
             <div className="flex items-center gap-2">
@@ -78,7 +78,7 @@ const Register = () => {
           <div className="rounded-[36px] border border-white/10 bg-[linear-gradient(155deg,#4f83d8_0%,#245fbe_38%,#0b3f97_100%)] p-8 text-white shadow-[0_24px_70px_rgba(0,59,149,0.28)]">
             <div className="max-w-[520px]">
               <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold tracking-[0.02em] text-white">
-                New host & guest account
+                Tài khoản khách & chủ chỗ nghỉ
               </span>
 
               <h1 className="mt-6 text-[42px] font-bold leading-[1.12] text-white">
@@ -87,14 +87,14 @@ const Register = () => {
 
               <p className="mt-5 max-w-[500px] text-[18px] leading-8 text-white/88">
                 Mở một tài khoản để lưu lịch sử đặt phòng, sử dụng ưu đãi thành
-                viên và quản lý property trên cùng hệ thống.
+                viên và quản lý chỗ nghỉ trên cùng hệ thống.
               </p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-2">
                 {[
                   "Đặt phòng nhanh hơn trên mọi thiết bị",
                   "Lưu thông tin và danh sách yêu thích",
-                  "Quản lý chỗ nghỉ và room trên cùng dashboard",
+                  "Quản lý chỗ nghỉ và phòng trên cùng trang quản lý",
                   "Nhận ưu đãi và thông báo phù hợp hơn",
                 ].map((item) => (
                   <div
@@ -111,8 +111,8 @@ const Register = () => {
                   Tài khoản này dùng được cho cả người đặt phòng và chủ chỗ nghỉ
                 </span>
                 <span className="mt-2 block text-sm leading-7 text-white/82">
-                  Sau khi tạo tài khoản, bạn có thể đặt phòng, quản lý booking
-                  và thêm property, room trên cùng một dashboard.
+                  Sau khi tạo tài khoản, bạn có thể đặt phòng, quản lý lịch đặt
+                  và thêm chỗ nghỉ, phòng trên cùng một trang quản lý.
                 </span>
               </div>
             </div>
@@ -124,7 +124,7 @@ const Register = () => {
             </span>
 
             <p className="mt-3 text-[15px] leading-7 text-secondary-2">
-              Điền thông tin cơ bản để bắt đầu sử dụng Booking.com cho hành
+              Điền thông tin cơ bản để bắt đầu sử dụng VietStayHub cho hành
               trình và việc quản lý chỗ nghỉ của bạn.
             </p>
 
@@ -206,7 +206,7 @@ const Register = () => {
 
             <div className="mt-6 rounded-2xl bg-[#f8fbff] p-4 text-sm leading-7 text-secondary-2">
               Tạo tài khoản đồng nghĩa với việc bạn chấp nhận các điều khoản và
-              chính sách bảo mật của Booking.com.
+              chính sách bảo mật của VietStayHub.
             </div>
 
             <div className="mt-6 text-center text-sm text-secondary-2">
