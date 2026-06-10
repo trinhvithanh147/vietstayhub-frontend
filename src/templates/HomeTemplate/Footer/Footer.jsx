@@ -14,7 +14,7 @@ const Footer = () => {
       <div className="container-custom grid gap-10 py-12 md:grid-cols-[1.3fr_1fr]">
         <div className="max-w-2xl">
           <span className="inline-flex rounded-full bg-white/10 px-4 py-1 text-sm font-semibold text-white/90">
-            Booking style
+            Nền tảng lưu trú Việt Nam
           </span>
           <h2 className="mt-4 text-3xl font-bold leading-tight md:text-4xl">
             Đặt phòng nhanh, giao diện gọn và dễ quản lý trên một hệ thống.
@@ -67,7 +67,7 @@ const Footer = () => {
           <div className="rounded-[24px] bg-white/8 p-5 backdrop-blur-sm">
             <span className="block text-sm text-white/70">Thông tin nhanh</span>
             <div className="mt-4 space-y-3 text-sm text-white/90">
-              <span className="block">Email: support@bookingweb.local</span>
+              <span className="block">Email: support@vietstayhub.com</span>
               <span className="block">Hotline: 1900 1234</span>
               <span className="block">Hỗ trợ đặt phòng 24/7</span>
               <span className="block">
@@ -80,7 +80,7 @@ const Footer = () => {
 
       <div className="border-t border-white/10">
         <div className="container-custom flex flex-col gap-3 px-4 py-4 text-sm text-white/70 md:flex-row md:items-center md:justify-between">
-          <span>© 2026 Booking Web. All rights reserved.</span>
+          <span>© 2026 VietStayHub. All rights reserved.</span>
           <span>Designed with the primary brand colors of your project.</span>
         </div>
       </div>
