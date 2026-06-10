@@ -110,6 +110,9 @@ const PropertyCard = () => {
   const [room, setRoom] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [messageCount, setMessageCount] = useState(0);
+  const [reviewRatingFilter, setReviewRatingFilter] = useState("all");
+  const [reviewSort, setReviewSort] = useState("newest");
+  const [favoriteIds, setFavoriteIds] = useState(() => getStoredFavorites());
   const { slug, city } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -404,9 +407,6 @@ const PropertyCard = () => {
     comment: "",
   });
   const [editingReviewId, setEditingReviewId] = useState("");
-  const [reviewRatingFilter, setReviewRatingFilter] = useState("all");
-  const [reviewSort, setReviewSort] = useState("newest");
-  const [favoriteIds, setFavoriteIds] = useState(() => getStoredFavorites());
 
   const handleChange = (type, value) => {
     setGuest((props) => ({
