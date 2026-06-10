@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { userService } from "../../../services/users.service";
+import { useConfirm } from "../../../components/ConfirmProvider/confirmContext";
 
 const initialForm = {
   full_name: "",
@@ -20,6 +21,7 @@ const getStoredUser = () => {
 };
 
 const ManageUser = () => {
+  const confirm = useConfirm();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(initialForm);
@@ -51,7 +53,16 @@ const ManageUser = () => {
   }, [items]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Xóa tài khoản này?")) return;
+    const accepted = await confirm({
+      title: "Xóa tài khoản",
+      message: "Bạn có chắc muốn xóa tài khoản này không?",
+      confirmText: "Xóa tài khoản",
+      cancelText: "Giữ lại",
+      tone: "danger",
+    });
+
+    if (!accepted) return;
+
     try {
       await userService.delete(id);
       await load();

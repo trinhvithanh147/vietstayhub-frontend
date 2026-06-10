@@ -11,6 +11,7 @@ import { path } from "../../../../hooks/path";
 import proPertiesService from "../../../../services/properties.service";
 import { roomService } from "../../../../services/room.service";
 import { BookingService } from "../../../../services/booking.service";
+import usePageTitle from "../../../../hooks/usePageTitle";
 
 const cityMeta = {
   "da-lat": {
@@ -161,10 +162,13 @@ const CityProperties = () => {
     title: cityKey,
     subtitle: "Danh sách khách sạn phù hợp với tìm kiếm của bạn.",
   };
+  usePageTitle(`Chỗ nghỉ tại ${cityInfo.title}`);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
   }, [cityKey]);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
 
     Promise.all([

@@ -2,6 +2,8 @@
 import { reviewService } from "../../../services/review.service";
 import { userService } from "../../../services/users.service";
 import proPertiesService from "../../../services/properties.service";
+import { notify } from "../../../utils/toast";
+import { useConfirm } from "../../../components/ConfirmProvider/confirmContext";
 
 const initialForm = {
   user_id: "",
@@ -11,6 +13,7 @@ const initialForm = {
 };
 
 const ManageReview = () => {
+  const confirm = useConfirm();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
@@ -87,7 +90,16 @@ const ManageReview = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa đánh giá này không?")) return;
+    const accepted = await confirm({
+      title: "Xóa đánh giá",
+      message: "Bạn có chắc muốn xóa đánh giá này không?",
+      confirmText: "Xóa đánh giá",
+      cancelText: "Giữ lại",
+      tone: "danger",
+    });
+
+    if (!accepted) return;
+
     try {
       await reviewService.delete(id);
       await load();
@@ -129,7 +141,7 @@ const ManageReview = () => {
       setItems(res.data.metaData || []);
     } catch (err) {
       console.log(err);
-      alert(err?.response?.data?.message || "Ẩn/hiện bình luận thất bại");
+      notify.error(err?.response?.data?.message || "Ẩn/hiện bình luận thất bại");
     }
   };
   const handleSubmit = async () => {

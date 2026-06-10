@@ -5,6 +5,7 @@ import flatVN from "../../../assets/images/Vn@3x.png";
 import { userService } from "../../../services/users.service";
 import { path } from "../../../hooks/path";
 import { validateRegister } from "../../../utils/validate";
+import { notify } from "../../../utils/toast";
 import logo from "../../../assets/images/logo.png";
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -30,7 +31,7 @@ const Register = () => {
     });
 
     if (errorMessage) {
-      alert(errorMessage);
+      notify.warning(errorMessage);
       return;
     }
 
@@ -41,11 +42,11 @@ const Register = () => {
         password: form.password,
       });
 
-      alert("Đăng ký thành công.");
+      notify.success("Đăng ký thành công.");
       navigate(path.login);
     } catch (err) {
       console.log(err);
-      alert(err?.response?.data?.message || "Đăng ký thất bại.");
+      notify.error(err?.response?.data?.message || "Đăng ký thất bại.");
     }
   };
 

@@ -5,6 +5,8 @@ import { conversationService } from "../../../../services/conversation.service";
 import { messageService } from "../../../../services/message.service";
 import defaultAvatar from "../../../../assets/images/avatar-default.jpg";
 import { path } from "../../../../hooks/path";
+import { notify } from "../../../../utils/toast";
+import usePageTitle from "../../../../hooks/usePageTitle";
 
 const getStoredUser = () => {
   try {
@@ -49,6 +51,7 @@ const formatTime = (value) => {
 };
 
 const MessagePage = () => {
+  usePageTitle("Tin nhắn");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const selectedConversationId = searchParams.get("conversation");
@@ -111,7 +114,7 @@ const MessagePage = () => {
       setActiveConversation(onlyHasMessageList[0] || null);
     } catch (err) {
       console.log(err);
-      alert("Không thể tải danh sách cuộc trò chuyện.");
+      notify.error("Không thể tải danh sách cuộc trò chuyện.");
     }
   };
 
@@ -124,7 +127,7 @@ const MessagePage = () => {
       setMessages(res.data.metaData || []);
     } catch (err) {
       console.log(err);
-      alert("Không thể tải tin nhắn.");
+      notify.error("Không thể tải tin nhắn.");
     } finally {
       setLoadingMessages(false);
     }
@@ -132,7 +135,7 @@ const MessagePage = () => {
 
   useEffect(() => {
     if (!currentUser?._id) {
-      alert("Vui lòng đăng nhập để xem tin nhắn.");
+      notify.warning("Vui lòng đăng nhập để xem tin nhắn.");
       navigate("/login");
       return;
     }
@@ -209,7 +212,7 @@ const MessagePage = () => {
     if (!content.trim()) return;
 
     if (!activeConversation?._id || !currentUser?._id || !receiverId) {
-      alert("Không xác định được người nhận tin nhắn.");
+      notify.warning("Không xác định được người nhận tin nhắn.");
       return;
     }
 
@@ -223,7 +226,13 @@ const MessagePage = () => {
     setContent("");
   };
   useEffect(() => {
-    const handleConversationUpdated = () => {
+    const handleConversationUpdated = (payload) => {
+      if (
+        payload?.conversation_id &&
+        String(payload.conversation_id) !== String(activeConversation?._id)
+      ) {
+        notify.info("Bạn có tin nhắn mới.");
+      }
       loadConversations();
     };
 
@@ -232,7 +241,7 @@ const MessagePage = () => {
     return () => {
       socket.off("conversation_updated", handleConversationUpdated);
     };
-  }, []);
+  }, [activeConversation?._id]);
   const otherUser = getOtherUser(activeConversation);
   const isHost = isCurrentUserHost(activeConversation);
 

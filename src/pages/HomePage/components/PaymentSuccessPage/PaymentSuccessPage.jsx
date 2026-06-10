@@ -203,7 +203,8 @@ const PaymentSuccessPage = () => {
                   Trạng thái đơn
                 </p>
                 <p className="mt-2 text-[15px] font-bold text-[#1f3b63]">
-                  {booking?.status || (isLoading ? "Đang kiểm tra" : "Chưa xác định")}
+                  {booking?.status ||
+                    (isLoading ? "Đang kiểm tra" : "Chưa xác định")}
                 </p>
               </div>
             </div>

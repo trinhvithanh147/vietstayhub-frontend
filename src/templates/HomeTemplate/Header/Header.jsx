@@ -17,6 +17,7 @@ import { roomService } from "../../../services/room.service";
 import { BookingService } from "../../../services/booking.service";
 import { userService } from "../../../services/users.service";
 import { conversationService } from "../../../services/conversation.service";
+import { notify } from "../../../utils/toast";
 import logo from "../../../assets/images/logo.png";
 const cityLabelMap = {
   "da-lat": "Đà Lạt",
@@ -361,7 +362,7 @@ const Header = () => {
     const citySlug = directCitySlug || matchedSuggestion?.citySlug || "";
 
     if (!citySlug) {
-      alert("Hãy nhập điểm đến hợp lệ để tìm kiếm.");
+      notify.warning("Hãy nhập điểm đến hợp lệ để tìm kiếm.");
       return;
     }
 
@@ -373,12 +374,12 @@ const Header = () => {
     const today = getToday();
 
     if (startDate < today) {
-      alert("Không thể tìm kiếm với ngày check-in trong quá khứ.");
+      notify.warning("Không thể tìm kiếm với ngày check-in trong quá khứ.");
       return;
     }
 
     if (endDate <= startDate) {
-      alert("Ngày check-out phải lớn hơn ngày check-in.");
+      notify.warning("Ngày check-out phải lớn hơn ngày check-in.");
       return;
     }
 
@@ -390,7 +391,7 @@ const Header = () => {
     );
 
     if (matchedProperties.length === 0) {
-      alert("Không tìm thấy chỗ nghỉ nào tại khu vực bạn chọn.");
+      notify.warning("Không tìm thấy chỗ nghỉ nào tại khu vực bạn chọn.");
       return;
     }
 
@@ -406,7 +407,7 @@ const Header = () => {
     );
 
     if (validPropertiesByDate.length === 0) {
-      alert(`Khu vực này chỉ cho phép đặt tối đa ${minMaxStayDays} đêm.`);
+      notify.warning(`Khu vực này chỉ cho phép đặt tối đa ${minMaxStayDays} đêm.`);
       return;
     }
 
@@ -431,7 +432,7 @@ const Header = () => {
     });
 
     if (matchedRooms.length === 0) {
-      alert(
+      notify.warning(
         `Không có phòng phù hợp cho ${guestsNeeded} người, ${roomsNeeded} phòng và ${nights} đêm tại khu vực bạn chọn.`,
       );
       return;

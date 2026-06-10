@@ -1,6 +1,7 @@
 ﻿import React, { useEffect, useMemo, useState } from "react";
 import { roomService } from "../../../services/room.service";
 import proPertiesService from "../../../services/properties.service";
+import { useConfirm } from "../../../components/ConfirmProvider/confirmContext";
 
 const roomBadgeFields = [
   ["balcony", "Ban công"],
@@ -79,6 +80,7 @@ const buildFormFromRoom = (room) => ({
 });
 
 const ManageRoom = () => {
+  const confirm = useConfirm();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [properties, setProperties] = useState([]);
@@ -150,7 +152,15 @@ const ManageRoom = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa phòng này không?")) return;
+    const accepted = await confirm({
+      title: "Xóa phòng",
+      message: "Bạn có chắc muốn xóa phòng này không?",
+      confirmText: "Xóa phòng",
+      cancelText: "Giữ lại",
+      tone: "danger",
+    });
+
+    if (!accepted) return;
 
     try {
       await roomService.delete(id);

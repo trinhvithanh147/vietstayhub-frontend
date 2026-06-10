@@ -4,8 +4,11 @@ import GuestFavoritesShowcase from "./components/GuestFavoritesPage/GuestFavorit
 import IdealStayShowcase from "./components/IdealStayPage/IdealStayShowcase";
 import { Link } from "react-router-dom";
 import { path } from "../../hooks/path";
+import usePageTitle from "../../hooks/usePageTitle";
 
 const HomePage = () => {
+  usePageTitle("Trang chủ");
+
   return (
     <main className="overflow-hidden bg-[linear-gradient(180deg,#f3f8ff_0%,#ffffff_32%,#f7fbff_100%)] pb-10 sm:pb-14 lg:pb-16">
       <HomeIntroShowcase />

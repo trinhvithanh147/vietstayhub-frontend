@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import proPertiesService from "../../../services/properties.service";
 import { userService } from "../../../services/users.service";
+import { notify } from "../../../utils/toast";
+import { useConfirm } from "../../../components/ConfirmProvider/confirmContext";
 
 const propertyAmenityFields = [
   ["outdoor_pool", "Hồ bơi ngoài trời"],
@@ -67,6 +69,7 @@ const buildFormFromProperty = (property) => ({
 });
 
 const ManageProperty = () => {
+  const confirm = useConfirm();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
@@ -152,7 +155,16 @@ const ManageProperty = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Xóa chỗ nghỉ này?")) return;
+    const accepted = await confirm({
+      title: "Xóa chỗ nghỉ",
+      message: "Bạn có chắc muốn xóa chỗ nghỉ này không?",
+      confirmText: "Xóa chỗ nghỉ",
+      cancelText: "Giữ lại",
+      tone: "danger",
+    });
+
+    if (!accepted) return;
+
     try {
       await proPertiesService.delete(id);
       if (editingId === id) handleReset();
@@ -213,7 +225,7 @@ const ManageProperty = () => {
 
   const handleSubmit = async () => {
     if (!form.user_id) {
-      alert("Vui lòng chọn chủ sở hữu cho chỗ nghỉ");
+      notify.warning("Vui lòng chọn chủ sở hữu cho chỗ nghỉ");
       return;
     }
 

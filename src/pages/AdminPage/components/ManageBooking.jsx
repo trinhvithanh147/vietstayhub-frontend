@@ -3,6 +3,7 @@ import { BookingService } from "../../../services/booking.service";
 import { userService } from "../../../services/users.service";
 import proPertiesService from "../../../services/properties.service";
 import { roomService } from "../../../services/room.service";
+import { useConfirm } from "../../../components/ConfirmProvider/confirmContext";
 
 const initialForm = {
   user_id: "",
@@ -83,6 +84,7 @@ const calculateNights = (checkIn, checkOut) => {
 };
 
 const ManageBooking = () => {
+  const confirm = useConfirm();
   const [items, setItems] = useState([]);
   const [users, setUsers] = useState([]);
   const [properties, setProperties] = useState([]);
@@ -249,7 +251,16 @@ const ManageBooking = () => {
   };
 
   const handleDelete = async (bookingId) => {
-    if (!window.confirm("Bạn có chắc muốn xóa booking này không?")) return;
+    const accepted = await confirm({
+      title: "Xóa booking",
+      message: "Bạn có chắc muốn xóa booking này không?",
+      confirmText: "Xóa booking",
+      cancelText: "Giữ lại",
+      tone: "danger",
+    });
+
+    if (!accepted) return;
+
     try {
       await BookingService.delete(bookingId);
       await load();

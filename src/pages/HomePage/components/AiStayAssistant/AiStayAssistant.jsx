@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { aiService } from "../../../../services/ai.service";
 import { LuBotMessageSquare } from "react-icons/lu";
+import { notify } from "../../../../utils/toast";
 const AiStayAssistant = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -9,7 +10,7 @@ const AiStayAssistant = () => {
 
   const handleAskAI = async () => {
     if (!message.trim()) {
-      alert("Bạn hãy nhập nhu cầu tìm chỗ nghỉ.");
+      notify.warning("Bạn hãy nhập nhu cầu tìm chỗ nghỉ.");
       return;
     }
 
@@ -19,7 +20,7 @@ const AiStayAssistant = () => {
       setAnswer(res.data.metaData || "");
     } catch (err) {
       console.log(err);
-      alert(err?.response?.data?.message || "AI đang gặp lỗi");
+      notify.error(err?.response?.data?.message || "AI đang gặp lỗi");
     } finally {
       setLoading(false);
     }

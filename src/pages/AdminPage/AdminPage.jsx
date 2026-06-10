@@ -6,8 +6,10 @@ import ManageReview from "./components/ManageReview";
 import ManageBooking from "./components/ManageBooking";
 import AdminStatisticsCharts from "./components/AdminStatisticsCharts";
 import { statisticService } from "../../services/statistic.service";
+import usePageTitle from "../../hooks/usePageTitle";
 
 const AdminPage = () => {
+  usePageTitle("Quản trị");
   const [tab, setTab] = useState("statistics");
   const [statistics, setStatistics] = useState(null);
   const [statisticsError, setStatisticsError] = useState("");

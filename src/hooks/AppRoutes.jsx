@@ -17,6 +17,7 @@ import AdminPage from "../pages/AdminPage/AdminPage";
 import HostDashboardPage from "../pages/HomePage/components/HostDashboardPage/HostDashboardPage";
 import MessagePage from "../pages/HomePage/components/MessagePage/MessagePage";
 import PaymentSuccessPage from "../pages/HomePage/components/PaymentSuccessPage/PaymentSuccessPage";
+import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 
 const AppRoutes = () => {
   return (
@@ -40,6 +41,7 @@ const AppRoutes = () => {
       <Route path={path.message} element={<MessagePage />} />
       <Route path="/payment-success" element={<PaymentSuccessPage />} />
       <Route path="/payment-cancel" element={<PaymentSuccessPage />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };

@@ -14,6 +14,8 @@ import { userService } from "../../../../services/users.service";
 import { conversationService } from "../../../../services/conversation.service";
 import logo from "../../../../assets/images/logo.png";
 import { UserRound } from "lucide-react";
+import { useConfirm } from "../../../../components/ConfirmProvider/confirmContext";
+import usePageTitle from "../../../../hooks/usePageTitle";
 const moneyFormatter = new Intl.NumberFormat("vi-VN");
 const calculateCurrentPrice = (originalPrice, discountPercent) => {
   const safeOriginalPrice = Number(originalPrice) || 0;
@@ -433,6 +435,8 @@ const BookingRow = ({ item, actionSlot, personMode = "booker" }) => {
   );
 };
 const HostDashboardPage = () => {
+  const confirm = useConfirm();
+  usePageTitle("Quản lý chỗ nghỉ");
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const avatarRef = useRef(null);
   const [messageCount, setMessageCount] = useState(0);
@@ -762,7 +766,16 @@ const HostDashboardPage = () => {
   };
 
   const handleDeleteProperty = async (propertyId) => {
-    if (!window.confirm("Ban co chac muon xoa property nay khong?")) return;
+    const accepted = await confirm({
+      title: "Xóa chỗ nghỉ",
+      message: "Bạn có chắc muốn xóa chỗ nghỉ này không?",
+      confirmText: "Xóa chỗ nghỉ",
+      cancelText: "Giữ lại",
+      tone: "danger",
+    });
+
+    if (!accepted) return;
+
     try {
       await proPertiesService.delete(propertyId);
       const data = await loadDashboardData(user._id);
@@ -821,7 +834,16 @@ const HostDashboardPage = () => {
   };
 
   const handleDeleteRoom = async (roomId) => {
-    if (!window.confirm("Ban co chac muon xoa room nay khong?")) return;
+    const accepted = await confirm({
+      title: "Xóa phòng",
+      message: "Bạn có chắc muốn xóa phòng này không?",
+      confirmText: "Xóa phòng",
+      cancelText: "Giữ lại",
+      tone: "danger",
+    });
+
+    if (!accepted) return;
+
     try {
       await roomService.delete(roomId);
       const data = await loadDashboardData(user._id);
@@ -880,7 +902,16 @@ const HostDashboardPage = () => {
   };
 
   const _handleDeleteReview = async (reviewId) => {
-    if (!window.confirm("Bạn có chắc muốn xóa bình luận này không?")) return;
+    const accepted = await confirm({
+      title: "Xóa bình luận",
+      message: "Bạn có chắc muốn xóa bình luận này không?",
+      confirmText: "Xóa bình luận",
+      cancelText: "Giữ lại",
+      tone: "danger",
+    });
+
+    if (!accepted) return;
+
     try {
       await reviewService.delete(reviewId);
       const data = await loadDashboardData(user._id);

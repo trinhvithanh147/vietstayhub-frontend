@@ -2,6 +2,7 @@ const Icon = {
   logoBrand: ({ className }) => {
     return (
       <svg
+        className={className}
         width="260"
         height="90"
         viewBox="0 0 520 180"

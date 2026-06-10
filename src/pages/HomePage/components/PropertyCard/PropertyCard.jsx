@@ -42,6 +42,10 @@ import { conversationService } from "../../../../services/conversation.service";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { UserRound } from "lucide-react";
+import { notify } from "../../../../utils/toast";
+import { useConfirm } from "../../../../components/ConfirmProvider/confirmContext";
+import EmptyState from "../../../../components/EmptyState/EmptyState";
+import usePageTitle from "../../../../hooks/usePageTitle";
 const getToday = () => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -89,6 +93,14 @@ const getStoredUser = () => {
   }
 };
 
+const getStoredFavorites = () => {
+  try {
+    return JSON.parse(localStorage.getItem("favoriteProperties") || "[]");
+  } catch {
+    return [];
+  }
+};
+
 const PropertyCard = () => {
   // State goc cua trang chi tiet: property, review, room.
   const [properties, setProperties] = useState({});
@@ -101,6 +113,7 @@ const PropertyCard = () => {
   const { slug, city } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const confirm = useConfirm();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug, city]);
@@ -151,6 +164,17 @@ const PropertyCard = () => {
     : 0;
 
   const totalComment = propertyReview.filter((item) => item.comment).length;
+  const filteredPropertyReviews = propertyReview
+    .filter((item) =>
+      reviewRatingFilter === "all"
+        ? true
+        : Number(item.rating) === Number(reviewRatingFilter),
+    )
+    .sort((a, b) => {
+      if (reviewSort === "highest") return Number(b.rating) - Number(a.rating);
+      if (reviewSort === "lowest") return Number(a.rating) - Number(b.rating);
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    });
 
   // Map key amenities sang text va icon de render giao dien.
   const amenitiesLabel = {
@@ -211,6 +235,8 @@ const PropertyCard = () => {
     rating: averageRating,
     review_count: totalComment,
   };
+  usePageTitle(newProperties?.title || "Chi tiết chỗ nghỉ");
+  const isFavorite = favoriteIds.includes(newProperties?._id);
   const gallerySlides = [
     ...(newProperties?.main_image_url
       ? [{ src: newProperties.main_image_url }]
@@ -304,6 +330,10 @@ const PropertyCard = () => {
     };
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("favoriteProperties", JSON.stringify(favoriteIds));
+  }, [favoriteIds]);
+
   const getInitialSearchState = () => {
     const params = new URLSearchParams(location.search);
     const checkInParam = params.get("checkIn");
@@ -374,12 +404,29 @@ const PropertyCard = () => {
     comment: "",
   });
   const [editingReviewId, setEditingReviewId] = useState("");
+  const [reviewRatingFilter, setReviewRatingFilter] = useState("all");
+  const [reviewSort, setReviewSort] = useState("newest");
+  const [favoriteIds, setFavoriteIds] = useState(() => getStoredFavorites());
 
   const handleChange = (type, value) => {
     setGuest((props) => ({
       ...props,
       [type]: Math.max(1, props[type] + value),
     }));
+  };
+
+  const handleToggleFavorite = () => {
+    if (!newProperties?._id) return;
+
+    setFavoriteIds((prev) => {
+      if (prev.includes(newProperties._id)) {
+        notify.info("Đã bỏ khỏi danh sách yêu thích.");
+        return prev.filter((item) => item !== newProperties._id);
+      }
+
+      notify.success("Đã lưu chỗ nghỉ vào danh sách yêu thích.");
+      return [...prev, newProperties._id];
+    });
   };
 
   useEffect(() => {
@@ -456,12 +503,12 @@ const PropertyCard = () => {
     e.preventDefault();
 
     if (!user?._id) {
-      alert("Bạn cần đăng nhập để gửi đánh giá.");
+      notify.warning("Bạn cần đăng nhập để gửi đánh giá.");
       return;
     }
 
     if (!properties?._id) {
-      alert("Không tìm thấy thông tin chỗ nghỉ để đánh giá.");
+      notify.warning("Không tìm thấy thông tin chỗ nghỉ để đánh giá.");
       return;
     }
 
@@ -487,7 +534,7 @@ const PropertyCard = () => {
       });
       setEditingReviewId("");
 
-      alert(
+      notify.success(
         res.data.message ||
           (editingReviewId
             ? "Cập nhật đánh giá thành công"
@@ -495,7 +542,7 @@ const PropertyCard = () => {
       );
     } catch (err) {
       console.log(err);
-      alert(
+      notify.error(
         err?.response?.data?.message ||
           (editingReviewId
             ? "Cập nhật đánh giá thất bại"
@@ -531,7 +578,15 @@ const PropertyCard = () => {
   };
 
   const handleDeleteReview = async (reviewId) => {
-    if (!window.confirm("Bạn có chắc muốn xóa đánh giá này không?")) return;
+    const accepted = await confirm({
+      title: "Xóa đánh giá",
+      message: "Bạn có chắc muốn xóa đánh giá này không?",
+      confirmText: "Xóa đánh giá",
+      cancelText: "Giữ lại",
+      tone: "danger",
+    });
+
+    if (!accepted) return;
 
     try {
       const res = await reviewService.delete(reviewId);
@@ -542,10 +597,10 @@ const PropertyCard = () => {
         handleCancelEditReview();
       }
 
-      alert(res?.data?.message || "Xóa đánh giá thành công");
+      notify.success(res?.data?.message || "Xóa đánh giá thành công");
     } catch (err) {
       console.log(err);
-      alert(err?.response?.data?.message || "Xóa đánh giá thất bại");
+      notify.error(err?.response?.data?.message || "Xóa đánh giá thất bại");
     }
   };
 
@@ -558,7 +613,7 @@ const PropertyCard = () => {
 
   const handleSearch = () => {
     if (draftSearchParams.endDate <= draftSearchParams.startDate) {
-      alert("Ngày check-out phải lớn hơn ngày check-in.");
+      notify.warning("Ngày check-out phải lớn hơn ngày check-in.");
       return;
     }
 
@@ -599,7 +654,7 @@ const PropertyCard = () => {
   // Tao booking khi nguoi dung bam nut dat phong.
   const handleCreateBooking = async (item) => {
     if (!user?._id) {
-      alert("Bạn cần đăng nhập để đặt phòng.");
+      notify.warning("Bạn cần đăng nhập để đặt phòng.");
       return;
     }
 
@@ -607,12 +662,12 @@ const PropertyCard = () => {
     const normalizedEndDate = appliedSearchParams.endDate;
 
     if (normalizedStartDate < getToday()) {
-      alert("Không thể đặt ngày check-in trong quá khứ.");
+      notify.warning("Không thể đặt ngày check-in trong quá khứ.");
       return;
     }
 
     if (normalizedEndDate <= normalizedStartDate) {
-      alert("Ngày check-out phải lớn hơn ngày check-in.");
+      notify.warning("Ngày check-out phải lớn hơn ngày check-in.");
       return;
     }
 
@@ -646,7 +701,7 @@ const PropertyCard = () => {
       window.location.href = checkoutUrl;
     } catch (err) {
       console.log(err);
-      alert(err?.response?.data?.message || "Đặt phòng thất bại");
+      notify.error(err?.response?.data?.message || "Đặt phòng thất bại");
     }
   };
 
@@ -674,7 +729,7 @@ const PropertyCard = () => {
       navigate(`/message?conversation=${conversationId}`);
     } catch (err) {
       console.log(err);
-      alert(err?.response?.data?.message || "Không thể mở cuộc trò chuyện.");
+      notify.error(err?.response?.data?.message || "Không thể mở cuộc trò chuyện.");
     }
   };
   return (
@@ -797,9 +852,23 @@ const PropertyCard = () => {
         <div className="container-custom text-[#1a1a1a]">
           <div className="rounded-[24px] bg-white p-4 shadow-[0_16px_45px_rgba(0,59,149,0.08)] sm:rounded-[32px] sm:p-6">
             <div className="border-b border-[#e4ecfb] pb-5">
-              <span className="block text-[28px] font-bold leading-tight text-primary sm:text-[34px]">
-                {newProperties?.title}
-              </span>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <span className="block text-[28px] font-bold leading-tight text-primary sm:text-[34px]">
+                  {newProperties?.title}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={handleToggleFavorite}
+                  className={`shrink-0 rounded-2xl border px-4 py-2 text-sm font-semibold transition ${
+                    isFavorite
+                      ? "border-[#f9c6c6] bg-[#fff5f5] text-[#b42318] hover:bg-[#ffecec]"
+                      : "border-[#dbe7ff] bg-[#f8fbff] text-[#006ce4] hover:bg-[#eef5ff]"
+                  }`}
+                >
+                  {isFavorite ? "Đã yêu thích" : "Lưu yêu thích"}
+                </button>
+              </div>
 
               <div className="mt-3 flex items-start gap-2 text-[15px] leading-6 text-[#5f7291]">
                 <span>
@@ -944,28 +1013,27 @@ const PropertyCard = () => {
                       pagination={{ clickable: true }}
                       loop={true}
                     >
-                      {propertyReview.map((item) => {
-                        return (
-                          <SwiperSlide key={item._id} className="h-full">
-                            <div className="flex h-full w-full flex-col justify-between px-5 pb-3">
-                              <span className="line-clamp-4">
-                                "{item.comment}"
-                              </span>
+                      {(filteredPropertyReviews.length
+                        ? filteredPropertyReviews
+                        : propertyReview
+                      ).map((item) => (
+                        <SwiperSlide key={item._id} className="h-full">
+                          <div className="flex h-full w-full flex-col justify-between px-5 pb-3">
+                            <span className="line-clamp-4">
+                              "{item.comment}"
+                            </span>
 
-                              <div className="mt-3 flex items-center gap-3">
-                                <img
-                                  src={
-                                    item.user_id?.avatar?.url || defaultAvatar
-                                  }
-                                  alt=""
-                                  className="h-[42px] w-[42px] rounded-full"
-                                />
-                                <span>{item.user_id?.full_name}</span>
-                              </div>
+                            <div className="mt-3 flex items-center gap-3">
+                              <img
+                                src={item.user_id?.avatar?.url || defaultAvatar}
+                                alt=""
+                                className="h-[42px] w-[42px] rounded-full"
+                              />
+                              <span>{item.user_id?.full_name}</span>
                             </div>
-                          </SwiperSlide>
-                        );
-                      })}
+                          </div>
+                        </SwiperSlide>
+                      ))}
                     </Swiper>
                   </div>
                 </div>
@@ -996,8 +1064,39 @@ const PropertyCard = () => {
                 này.
               </span>
 
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <select
+                  value={reviewRatingFilter}
+                  onChange={(e) => setReviewRatingFilter(e.target.value)}
+                  className="h-11 rounded-2xl border border-[#d9e2f1] bg-white px-4 text-sm font-semibold text-[#26446d] outline-none focus:border-[#006ce4]"
+                >
+                  <option value="all">Tất cả đánh giá</option>
+                  <option value="5">5 sao</option>
+                  <option value="4">4 sao</option>
+                  <option value="3">3 sao</option>
+                  <option value="2">2 sao</option>
+                  <option value="1">1 sao</option>
+                </select>
+
+                <select
+                  value={reviewSort}
+                  onChange={(e) => setReviewSort(e.target.value)}
+                  className="h-11 rounded-2xl border border-[#d9e2f1] bg-white px-4 text-sm font-semibold text-[#26446d] outline-none focus:border-[#006ce4]"
+                >
+                  <option value="newest">Mới nhất</option>
+                  <option value="highest">Điểm cao nhất</option>
+                  <option value="lowest">Điểm thấp nhất</option>
+                </select>
+              </div>
+
               <div className="mt-5 space-y-3">
-                {propertyReview.slice(0, 2).map((item) => (
+                {filteredPropertyReviews.length === 0 && (
+                  <EmptyState
+                    title="Chưa có review phù hợp"
+                    description="Hãy thử chọn bộ lọc khác để xem thêm cảm nhận của khách."
+                  />
+                )}
+                {filteredPropertyReviews.slice(0, 2).map((item) => (
                   <div
                     key={item._id}
                     className="rounded-[20px] border border-[#deebff] bg-white px-4 py-3"
